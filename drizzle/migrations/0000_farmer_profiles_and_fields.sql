@@ -1,0 +1,18 @@
+CREATE TABLE public.profiles (id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE, display_name text NOT NULL DEFAULT '', district text NOT NULL DEFAULT '', created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT ALL ON public.profiles TO service_role;
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Read own profile" ON public.profiles FOR SELECT TO authenticated USING ((select auth.uid()) = id);
+CREATE POLICY "Update own profile" ON public.profiles FOR UPDATE TO authenticated USING ((select auth.uid()) = id) WITH CHECK ((select auth.uid()) = id);
+CREATE POLICY "Insert own profile" ON public.profiles FOR INSERT TO authenticated WITH CHECK ((select auth.uid()) = id);
+CREATE OR REPLACE FUNCTION public.create_farmer_profile() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$ BEGIN INSERT INTO public.profiles (id, display_name, district) VALUES (NEW.id, COALESCE(NEW.raw_user_meta_data->>'display_name', ''), COALESCE(NEW.raw_user_meta_data->>'district', '')); RETURN NEW; END; $$;
+CREATE TRIGGER create_farmer_profile_after_signup AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.create_farmer_profile();
+CREATE TABLE public.farmer_fields (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), owner_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE, name text NOT NULL CHECK (char_length(name) BETWEEN 1 AND 100), district text NOT NULL DEFAULT '', latitude double precision NOT NULL CHECK (latitude BETWEEN -90 AND 90), longitude double precision NOT NULL CHECK (longitude BETWEEN -180 AND 180), crop text NOT NULL DEFAULT '', season text NOT NULL DEFAULT '', water text NOT NULL DEFAULT 'Moderate', priority text NOT NULL DEFAULT 'Save water', size_ha numeric NOT NULL DEFAULT 1 CHECK (size_ha > 0), created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.farmer_fields TO authenticated;
+GRANT ALL ON public.farmer_fields TO service_role;
+ALTER TABLE public.farmer_fields ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Read own fields" ON public.farmer_fields FOR SELECT TO authenticated USING ((select auth.uid()) = owner_id);
+CREATE POLICY "Insert own fields" ON public.farmer_fields FOR INSERT TO authenticated WITH CHECK ((select auth.uid()) = owner_id);
+CREATE POLICY "Update own fields" ON public.farmer_fields FOR UPDATE TO authenticated USING ((select auth.uid()) = owner_id) WITH CHECK ((select auth.uid()) = owner_id);
+CREATE POLICY "Delete own fields" ON public.farmer_fields FOR DELETE TO authenticated USING ((select auth.uid()) = owner_id);
+CREATE INDEX farmer_fields_owner_idx ON public.farmer_fields(owner_id);
