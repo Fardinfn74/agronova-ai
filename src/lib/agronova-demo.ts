@@ -863,45 +863,118 @@ export function adjustedScenario(
   };
 }
 
-export function novaReply(question: string, language: Language, selected: Scenario) {
-  const q = question.toLowerCase();
+export function novaReply(question: string, language: Language, selected: Scenario): string {
+  const q = question.toLowerCase().trim();
 
+  // Non-agricultural off-topic check
+  const nonAgriKeywords = [
+    "code", "python", "javascript", "react", "html", "css", "sql", "programming", "software",
+    "movie", "actor", "actress", "cinema", "song", "music", "singer", "hollywood", "bollywood",
+    "football", "soccer", "cricket", "basketball", "messi", "ronaldo", "game", "gaming", "playstation",
+    "crypto", "bitcoin", "ethereum", "stock market", "trading", "politics", "president", "election",
+    "homework", "math", "calculus", "joke", "story",
+  ];
+
+  const agriKeywords = [
+    "crop", "farm", "field", "soil", "seed", "plant", "water", "rain", "irrigation",
+    "rice", "wheat", "maize", "potato", "tomato", "mustard", "mungbean", "lentil", "jute",
+    "pest", "disease", "fertilizer", "urea", "nitrogen", "npk", "fungus", "blight", "rust",
+    "rot", "yield", "rotation", "harvest", "sowing", "weather", "nasa", "smap", "power",
+    "gpm", "climate", "temp", "humidity", "moisture", "drought", "flood", "loam", "clay",
+    "কৃষি", "ফসল", "জমি", "মাটি", "ধান", "গম", "সার", "কীটপতঙ্গ", "বৃষ্টি", "আবর্তন",
+    "खेती", "फसल", "खेत", "मिट्टी", "धान", "गेहूं", "उर्वरक", "कीट", "बारिश", "चक्र",
+    "agricultura", "cultivo", "suelo", "riego", "plaga", "enfermedad", "clima", "cosecha",
+    "kilimo", "mazao", "udongo", "maji", "mvua", "wadudu", "mbolea",
+  ];
+
+  const hasAgri = agriKeywords.some((term) => q.includes(term));
+  const isOffTopic = !hasAgri && nonAgriKeywords.some((kw) => {
+    const rx = new RegExp(`\\b${kw}\\b`, "i");
+    return rx.test(q);
+  });
+
+  if (isOffTopic) {
+    if (language === "bn") {
+      return "আমি নোভা, আপনার নিবেদিত কৃষি ও ফসল বিশেষজ্ঞ। আমি কেবলমাত্র কৃষিকাজ, ফসল আবর্তন, মাটির স্বাস্থ্য, রোগবালাই দমন এবং নাসার স্যাটেলাইট তথ্য সম্পর্কিত বিষয়ে উত্তর দিতে পারি। আপনার জমি বা ফসল নিয়ে যেকোনো প্রশ্ন করুন!";
+    }
+    if (language === "hi") {
+      return "मैं नोवा हूँ, आपका समर्पित कृषि और फसल विशेषज्ञ। मैं केवल खेती, फसल चक्र, मिट्टी के स्वास्थ्य, रोग प्रबंधन और नासा उपग्रह जलवायु डेटा से संबंधित प्रश्नों में ही सहायता कर सकता हूँ। कृपया अपने खेत या फसल से संबंधित कोई प्रश्न पूछें!";
+    }
+    if (language === "es") {
+      return "Soy Nova, tu especialista agronómico y de cultivos. Solo puedo responder preguntas sobre agricultura, rotación de cultivos, salud del suelo, patología vegetal y datos satelitales de la NASA. ¡Hazme una pregunta sobre tus cultivos!";
+    }
+    if (language === "sw") {
+      return "Mimi ni Nova, mtaalamu wako wa kilimo na mazao. Ninaweza kujibu maswali yanayohusu kilimo, mzunguko wa mazao, afya ya udongo, magonjwa ya mimea, na takwimu za satelaiti za NASA pekee. Tafadhali niulize swali kuhusu shamba lako!";
+    }
+    return "I am Nova, your specialized agricultural companion. I am exclusively trained to assist with farming, crop rotations, soil health, plant pathology, and NASA satellite climate data for your fields. Please ask me a farming or crop-related question!";
+  }
+
+  // Bengali responses
   if (language === "bn") {
-    if (q.includes("nasa") || question.includes("তথ্য")) {
-      return `এই ব্যাখ্যায় NASA SMAP-এর মাটির আর্দ্রতা, GPM-এর বৃষ্টি এবং POWER-এর তাপমাত্রার তথ্য ব্যবহার করা হয়েছে। প্রতিটি মানের তারিখ ও সীমাবদ্ধতা “প্রমাণ দেখুন”-এ আছে।`;
+    if (q.includes("nasa") || q.includes("স্যাটেলাইট") || q.includes("তথ্য")) {
+      return `এই সুপারিশে NASA SMAP-এর মাটির আর্দ্রতা, GPM-এর বৃষ্টিপাত এবং POWER-এর তাপমাত্রা ও বিকিরণ তথ্য ব্যবহার করা হয়েছে। এই উপগ্রহ তথ্যগুলো মাটির পানির ঘাটতি ও ফসল বোনার উপযুক্ত সময় নির্ধারণে সাহায্য করে।`;
     }
-    return `${selected.name} বিকল্পটি বিবেচনা করা যেতে পারে, কারণ এতে পানির চাপ কম এবং মৌসুমি সামঞ্জস্য ভালো। এটি একটি ডেমো ব্যাখ্যা—ফলনের নিশ্চয়তা নয়। স্থানীয় আবহাওয়া ও কৃষি পরামর্শও যাচাই করুন।`;
+    if (q.includes("পানি") || q.includes("বৃষ্টি") || q.includes("সেচ")) {
+      return `${selected.name} আবর্তনে পানি সাশ্রয়ের হার প্রায় ${selected.water}/১০০। ধান কাটার পর ডালজাতীয় ফসল করলে মাটির অবশিষ্ট আর্দ্রতা কাজে লাগে এবং অতিরিক্ত সেচের খরচ বেঁচে যায়।`;
+    }
+    if (q.includes("মাটি") || q.includes("সার") || q.includes("নাইট্রোজেন")) {
+      return `এই আবর্তনে লেগুমিনাস (মুগ ডাল) ফসল অন্তর্ভুক্ত করায় রাইজোবিয়াম ব্যাকটেরিয়ার মাধ্যমে বায়ুমণ্ডল থেকে প্রাকৃতিকভাবে নাইট্রোজেন সংবদ্ধিত হয়, ফলে পরবর্তী ফসলে ইউরিয়া সারের ব্যবহার ২০-২৫% কম লাগে।`;
+    }
+    if (q.includes("রোগ") || q.includes("বালাই") || q.includes("কীটপতঙ্গ")) {
+      return `একই জমিতে বারবার এক ফসল চাষ করলে মাটিতে ক্ষতিকর জীবাণু জমা হয়। ${selected.sequence.join(" → ")} চক্র অনুসরণ করলে পোকামাকড় ও ব্লাস্ট রোগের জীবনচক্র ভেঙে যায়।`;
+    }
+    return `${selected.name} আবর্তনটি আপনার জমির জন্য সর্বোত্তম। এটি NASA Earth ডাটার সাথে সংগতিপূর্ণ এবং পানির চাপ কমিয়ে মাটির উর্বরতা বাড়ায়।`;
   }
 
+  // Hindi responses
   if (language === "hi") {
-    if (q.includes("nasa") || q.includes("डेटा")) {
-      return `इस सलाह में NASA SMAP मिट्टी की नमी, GPM वर्षा और POWER तापमान डेटा का उपयोग किया गया है। स्रोत और विवरण देखने के लिए साक्ष्य दराज खोलें।`;
+    if (q.includes("nasa") || q.includes("उपग्रह") || q.includes("डेटा")) {
+      return `यह सलाह NASA SMAP मिट्टी की नमी, GPM उपग्रह वर्षा और POWER कृषि-जलवायु डेटा पर आधारित है। यह उपग्रह डेटा मिट्टी की जल आवश्यकता और सटीक बुवाई का समय निर्धारित करने में मदद करता है।`;
     }
-    return `${selected.name} विकल्प का चयन जल उपयोग संतुलन और मौसमी उपयुक्तता के लिए अनुशंसित है। यह परिदृश्य अनुमान है, उपज की गारंटी नहीं।`;
+    if (q.includes("पानी") || q.includes("बारिश") || q.includes("सिंचाई")) {
+      return `${selected.name} चक्र जल दक्षता स्कोर ${selected.water}/100 प्रदान करता है। दलहनी फसलों को शामिल करने से भूजल का अत्यधिक दोहन रुकता है और सिंचाई लागत कम होती है।`;
+    }
+    if (q.includes("रोग") || q.includes("कीट") || q.includes("कीड़ा")) {
+      return `${selected.sequence.join(" → ")} का फसल चक्र अपनाने से मिट्टी में पैदा होने वाले रोगजनकों और कीटों का चक्र टूट जाता है, जिससे कीटनाशकों का खर्च कम होता है।`;
+    }
+    return `${selected.name} विकल्प का चयन जल उपयोग संतुलन और मौसमी उपयुक्तता के लिए अनुशंसित है। यह परिदृश्य नासा डेटा पर आधारित है।`;
   }
 
+  // Spanish responses
   if (language === "es") {
-    if (q.includes("nasa") || q.includes("datos")) {
-      return `Esta explicación utiliza observaciones de humedad del suelo de NASA SMAP, precipitación de GPM y temperatura de POWER. Abra la evidencia para ver fechas y resolución.`;
+    if (q.includes("nasa") || q.includes("satélite") || q.includes("datos")) {
+      return `Esta recomendación integra observaciones satelitales de humedad del suelo NASA SMAP, lluvia de GPM IMERG y radiación/temperatura de POWER para maximizar la resiliencia climática del cultivo.`;
     }
-    return `La opción ${selected.name} se adapta mejor equilibrando el consumo hídrico y la resiliencia climática. Esta es una recomendación de apoyo, no una garantía de rendimiento.`;
+    if (q.includes("agua") || q.includes("lluvia") || q.includes("riego")) {
+      return `La rotación ${selected.name} tiene un puntaje de ajuste hídrico de ${selected.water}/100, reduciendo el estrés en periodos de sequía mediante cultivos de ciclo corto.`;
+    }
+    return `La opción ${selected.name} (${selected.sequence.join(" → ")}) equilibra el consumo de agua, fija nitrógeno en el suelo y rompe ciclos de plagas comunes.`;
   }
 
+  // Swahili responses
   if (language === "sw") {
-    if (q.includes("nasa") || q.includes("takwimu")) {
-      return `Ufafanuzi huu unatumia data ya unyevu wa udongo ya NASA SMAP, mvua ya GPM, na joto la POWER. Fungua ushahidi kuona maelezo kamili.`;
+    if (q.includes("nasa") || q.includes("satelaiti") || q.includes("takwimu")) {
+      return `Ushauri huu unatumia data ya unyevu wa udongo ya NASA SMAP, mvua ya GPM, na joto/mionzi ya POWER kusaidia kupanga upanzi kulingana na msimu.`;
     }
-    return `Chaguo la ${selected.name} linapendekezwa kwa sababu linapunguza matumizi ya maji na kulingana na msimu. Huu ni ushauri wa kusaidia maamuzi ya kilimo.`;
+    return `Mzunguko wa ${selected.name} (${selected.sequence.join(" → ")}) unalinda shamba lako dhidi ya ukame kwa kuboresha afya ya udongo na kupunguza matumizi ya maji.`;
   }
 
-  if (q.includes("nasa") || q.includes("data")) {
-    return "This explanation uses observations from NASA SMAP soil moisture, GPM rainfall, and POWER agroclimatology. Open the evidence drawer to inspect each source, processing step, resolution, and limitation.";
+  // English responses
+  if (q.includes("nasa") || q.includes("satellite") || q.includes("data") || q.includes("smap") || q.includes("power")) {
+    return "This agronomic advice is directly calibrated using NASA SMAP (root-zone soil moisture), GPM IMERG (satellite precipitation estimates), and NASA POWER (daily solar irradiance, temperature, and relative humidity). These Earth observations ensure planting schedules match actual soil moisture rather than guesswork.";
   }
-  if (q.includes("rain") || q.includes("water")) {
-    return `${selected.name} is prioritized because it balances water exposure against seasonal dry spells. Shorter, lower-demand crops protect the field better during erratic rainfall.`;
+  if (q.includes("rain") || q.includes("water") || q.includes("irrigation") || q.includes("drought")) {
+    return `${selected.name} scores ${selected.water}/100 for water-fit. By rotating from high-demand paddy rice into low-water pulses, you conserve groundwater and capitalize on residual root-zone moisture detected by NASA SMAP.`;
   }
-  return `${selected.name} aligns best with your field priority because it balances water exposure, seasonal fit, and soil recovery. This is decision-support advice; consult local agronomic extensions.`;
+  if (q.includes("soil") || q.includes("fertilizer") || q.includes("nitrogen") || q.includes("nutrient")) {
+    return `In this sequence (${selected.sequence.join(" → ")}), introducing legumes fixes atmospheric nitrogen into the soil (soil score: ${selected.soil}/100). This reduces synthetic urea/NPK requirements by 20-30% for the subsequent cereal crop.`;
+  }
+  if (q.includes("pest") || q.includes("disease") || q.includes("blast") || q.includes("blight") || q.includes("fungus")) {
+    return `Monoculture cultivations build up soil-borne pathogens and insect populations. Switching crops through ${selected.sequence.join(" → ")} disrupts host availability, suppressing stem borers, fungal blast, and root rots naturally.`;
+  }
+  return `${selected.name} (${selected.sequence.join(" → ")}) is prioritized for your field because it balances seasonal water availability, soil nutrient restoration, and climate resilience (${selected.resilience}/100). Grounded in NASA Earth observations.`;
 }
+
 // Sample farmer shown in the demo Profile section (not a real person).
 export const demoFarmer = {
   name: "Abdul Karim (demo)",

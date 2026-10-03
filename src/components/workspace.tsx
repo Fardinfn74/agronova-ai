@@ -97,14 +97,14 @@ function useNovaChat(lang: Language, scenario: Scenario, field: DemoField, nasaD
       me: false,
       text:
         lang === "bn"
-          ? "আমি নোভা। আপনার জমি ও ফসল আবর্তন নিয়ে প্রশ্ন করুন।"
+          ? "নমস্কার/সালাম! আমি নোভা — আপনার কৃষি ও নাসা স্যাটেলাইট তথ্য বিশেষজ্ঞ। আপনার জমি, ফসল নির্বাচন, রোগবালাই বা সেচ নিয়ে প্রশ্ন করুন।"
           : lang === "hi"
-            ? "नमस्ते, मैं नोवा हूँ। अपने खेत और फसल चक्र के बारे में पूछें।"
+            ? "नमस्ते! मैं नोवा हूँ — आपका कृषि और नासा उपग्रह विशेषज्ञ। अपने खेत, फसल चक्र, रोग नियंत्रण या सिंचाई के बारे में पूछें।"
             : lang === "es"
-              ? "Hola, soy Nova. Pregúntame sobre tu parcela y rotación."
+              ? "¡Hola! Soy Nova, tu especialista en agronomía y datos satelitales de la NASA. Pregúntame sobre tus cultivos, suelo, plagas o riego."
               : lang === "sw"
-                ? "Habari, mimi ni Nova. Niulize kuhusu shamba lako."
-                : "Hi, I'm Nova. Ask me about your field and scenario.",
+                ? "Habari! Mimi ni Nova — mtaalamu wako wa kilimo na takwimu za satelaiti za NASA. Niulize kuhusu mazao, udongo, au umwagiliaji."
+                : "Hello! I'm Nova, your certified AI Agronomy & NASA Earth Observation Specialist. Ask me about your crops, soil moisture, pest defense, or satellite climate data.",
     },
   ]);
 
@@ -1553,21 +1553,29 @@ function Nova({ lang, label, chat }: { lang: Language; label: string; chat: Retu
 
   const presets =
     lang === "bn"
-      ? ["কেন এই বিকল্প?", "NASA তথ্য কী?"]
+      ? ["মাটির আর্দ্রতায় NASA কী দেখাচ্ছে?", "ব্লাস্ট রোগ কীভাবে নিয়ন্ত্রণ করব?", "আবর্তন কীভাবে পানি বাঁচাবে?", "ইউরিয়া সারের সঠিক সময়?"]
       : lang === "hi"
-        ? ["यह विकल्प क्यों?", "NASA डेटा क्या है?"]
+        ? ["NASA मिट्टी की नमी क्या बताती है?", "ब्लास्ट रोग कैसे रोकें?", "फसल चक्र से पानी कैसे बचेगा?", "यूरिया खाद कब डालें?"]
         : lang === "es"
-          ? ["¿Por qué esta opción?", "¿Qué datos de NASA usa?"]
+          ? ["¿Qué muestra NASA SMAP en mi suelo?", "¿Cómo prevenir el tizón del arroz?", "¿Cómo ahorra agua la rotación?", "¿Cuándo aplicar fertilizante?"]
           : lang === "sw"
-            ? ["Kwanini chaguo hili?", "Data gani ya NASA?"]
-            : ["Why this rotation?", "What NASA data?", "What if rain drops?"];
+            ? ["NASA SMAP inaonyesha nini?", "Jinsi ya kuzuia ukungu?", "Mzunguko huokoaje maji?", "Wakati gani wa kuweka mbolea?"]
+            : ["What does NASA SMAP show for my soil?", "How to prevent rice blast?", "How does rotation save water?", "When to apply urea fertilizer?"];
 
   return (
     <div className="clay-card p-5">
-      <p className="font-display mb-3 flex items-center gap-2 text-xl">
-        <BookOpen className="h-5 w-5" />
-        {label}
-      </p>
+      <div className="mb-3 flex items-center justify-between border-b border-border pb-2.5">
+        <div>
+          <p className="font-display flex items-center gap-2 text-lg font-bold">
+            <Sparkles className="h-5 w-5 text-amber-500 animate-pulse" />
+            Nova AI Specialist
+          </p>
+          <p className="text-[11px] text-muted-foreground">Agronomy &amp; NASA Earth Observation Advisor</p>
+        </div>
+        <span className="rounded-full bg-primary/10 border border-primary/20 px-2 py-0.5 text-[10px] font-semibold text-primary">
+          🌾 Farming Only
+        </span>
+      </div>
       <div className="max-h-72 space-y-2 overflow-y-auto">
         {msgs.map((m, i) => (
           <div key={i} className={`flex items-start gap-1.5 ${m.me ? "justify-end" : "justify-start"}`}>
