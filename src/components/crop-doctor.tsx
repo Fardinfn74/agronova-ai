@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import { diagnoseCropImage, getGeminiApiKey } from "@/lib/gemini";
 import { AgroButton } from "@/components/agronova-button";
+import { useSpeech } from "@/hooks/use-speech";
+
 
 const severityColor: Record<CropDisease["severity"], string> = {
   High: "bg-destructive/15 text-destructive border-destructive/30",
@@ -287,20 +289,14 @@ export function CropDoctor({ lang }: { lang: Language }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const speakReport = () => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const cleanText = aiReport.replace(/[*#_`]/g, "");
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    const codeMap: Record<Language, string> = {
-      en: "en-US",
-      bn: "bn-BD",
-      hi: "hi-IN",
-      es: "es-ES",
-      sw: "sw-KE",
-    };
-    utterance.lang = codeMap[lang] || "en-US";
-    window.speechSynthesis.speak(utterance);
+  const { speak: speakNovaVoice, stop: stopNovaVoice, speaking: isSpeakingNova } = useSpeech(lang);
+
+  const toggleSpeakReport = () => {
+    if (isSpeakingNova) {
+      stopNovaVoice();
+    } else if (aiReport) {
+      speakNovaVoice(aiReport);
+    }
   };
 
   const hasApiKey = Boolean(getGeminiApiKey());
@@ -514,11 +510,11 @@ export function CropDoctor({ lang }: { lang: Language }) {
                       <AgroButton
                         type="button"
                         size="sm"
-                        variant="secondary"
-                        onClick={speakReport}
-                        title="Read diagnosis aloud"
+                        variant={isSpeakingNova ? "primary" : "secondary"}
+                        onClick={toggleSpeakReport}
+                        title={isSpeakingNova ? "Stop voice" : "Read diagnosis aloud in Nova's voice"}
                       >
-                        <Volume2 className="h-3.5 w-3.5" />
+                        <Volume2 className={`h-3.5 w-3.5 ${isSpeakingNova ? "animate-pulse" : ""}`} />
                       </AgroButton>
                       <AgroButton
                         type="button"

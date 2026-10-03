@@ -1551,32 +1551,27 @@ function Nova({ lang, label, chat }: { lang: Language; label: string; chat: Retu
     }
   };
 
-  const presets =
-    lang === "bn"
-      ? ["মাটির আর্দ্রতায় NASA কী দেখাচ্ছে?", "ব্লাস্ট রোগ কীভাবে নিয়ন্ত্রণ করব?", "আবর্তন কীভাবে পানি বাঁচাবে?", "ইউরিয়া সারের সঠিক সময়?"]
-      : lang === "hi"
-        ? ["NASA मिट्टी की नमी क्या बताती है?", "ब्लास्ट रोग कैसे रोकें?", "फसल चक्र से पानी कैसे बचेगा?", "यूरिया खाद कब डालें?"]
-        : lang === "es"
-          ? ["¿Qué muestra NASA SMAP en mi suelo?", "¿Cómo prevenir el tizón del arroz?", "¿Cómo ahorra agua la rotación?", "¿Cuándo aplicar fertilizante?"]
-          : lang === "sw"
-            ? ["NASA SMAP inaonyesha nini?", "Jinsi ya kuzuia ukungu?", "Mzunguko huokoaje maji?", "Wakati gani wa kuweka mbolea?"]
-            : ["What does NASA SMAP show for my soil?", "How to prevent rice blast?", "How does rotation save water?", "When to apply urea fertilizer?"];
-
   return (
     <div className="clay-card p-5">
       <div className="mb-3 flex items-center justify-between border-b border-border pb-2.5">
-        <div>
-          <p className="font-display flex items-center gap-2 text-lg font-bold">
-            <Sparkles className="h-5 w-5 text-amber-500 animate-pulse" />
-            Nova AI Specialist
-          </p>
-          <p className="text-[11px] text-muted-foreground">Agronomy &amp; NASA Earth Observation Advisor</p>
+        <div className="flex items-center gap-2.5">
+          <img
+            src={novaMascot}
+            alt="NOVA"
+            className="h-8 w-8 object-contain rounded-full bg-primary/10 p-0.5"
+          />
+          <div>
+            <p className="font-display text-lg font-bold tracking-wide">
+              NOVA
+            </p>
+            <p className="text-[11px] text-muted-foreground">Agronomy &amp; NASA Earth Observation</p>
+          </div>
         </div>
         <span className="rounded-full bg-primary/10 border border-primary/20 px-2 py-0.5 text-[10px] font-semibold text-primary">
           🌾 Farming Only
         </span>
       </div>
-      <div className="max-h-72 space-y-2 overflow-y-auto">
+      <div className="max-h-80 space-y-2 overflow-y-auto pr-1">
         {msgs.map((m, i) => (
           <div key={i} className={`flex items-start gap-1.5 ${m.me ? "justify-end" : "justify-start"}`}>
             <p className={`rounded-2xl px-3 py-2 text-sm ${m.me ? "bg-primary text-primary-foreground ml-6" : "bg-secondary mr-2 flex-1"}`}>
@@ -1584,13 +1579,6 @@ function Nova({ lang, label, chat }: { lang: Language; label: string; chat: Retu
             </p>
             {!m.me && <SpeechButton text={m.text} lang={lang} />}
           </div>
-        ))}
-      </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {presets.map((p) => (
-          <button key={p} onClick={() => send(p)} className="clay-chip px-3 py-1 text-xs">
-            {p}
-          </button>
         ))}
       </div>
       <form

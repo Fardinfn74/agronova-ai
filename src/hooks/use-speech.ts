@@ -1,22 +1,47 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import type { Language } from "@/lib/agronova-demo";
 
 const LANG_VOICE_MAP: Record<Language, string[]> = {
-  en: ["en-US", "en-GB", "en"],
+  en: ["en-US", "en-GB", "en-CA", "en-AU", "en"],
   bn: ["bn-BD", "bn-IN", "bn"],
   hi: ["hi-IN", "hi"],
-  es: ["es-ES", "es-MX", "es"],
+  es: ["es-ES", "es-MX", "es-US", "es"],
   sw: ["sw-KE", "sw-TZ", "sw"],
 };
+
+// Female voice name identifiers across Chrome, Edge, Safari, iOS, and Android
+const FEMALE_VOICE_NAMES = [
+  "female", "girl", "woman",
+  "zira", "jenny", "aria", "samantha", "victoria", "karen", "tessa", "moira",
+  "sonia", "heera", "tanvi", "swara", "shreya", "ananya",
+  "elena", "monica", "paulina", "sabina", "tashi", "salma",
+  "google us english", "google uk english female",
+];
 
 export function useSpeech(lang: Language = "en") {
   const [speaking, setSpeaking] = useState(false);
   const [supported, setSupported] = useState(false);
+  const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      setSupported(true);
-    }
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    setSupported(true);
+
+    const updateVoices = () => {
+      const v = window.speechSynthesis.getVoices();
+      if (v.length > 0) {
+        voicesRef.current = v;
+      }
+    };
+
+    updateVoices();
+    window.speechSynthesis.onvoiceschanged = updateVoices;
+
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.onvoiceschanged = null;
+      }
+    };
   }, []);
 
   const speak = useCallback(
@@ -25,21 +50,51 @@ export function useSpeech(lang: Language = "en") {
 
       window.speechSynthesis.cancel(); // Cancel any ongoing speech
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.95;
-      utterance.pitch = 1.0;
+      // Clean markdown tags, asterisks, hashtags for smooth pronunciation
+      const cleanText = text.replace(/[*#_`]/g, "").trim();
+      if (!cleanText) return;
 
-      // Attempt to pick an appropriate language voice
-      const voices = window.speechSynthesis.getVoices();
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+
+      // Nova Voice Persona: Clear, lively 18 to 20 year old girl voice
+      // Pitch: 1.22 gives a bright, youthful, articulate female tone without sounding squeaky
+      // Rate: 1.02 delivers clean, natural, engaging pacing
+      utterance.pitch = 1.22;
+      utterance.rate = 1.02;
+
+      const availableVoices =
+        voicesRef.current.length > 0
+          ? voicesRef.current
+          : window.speechSynthesis.getVoices();
+
       const preferredCodes = LANG_VOICE_MAP[lang] || ["en-US"];
-      const matchedVoice = voices.find((v) =>
+
+      // 1. Filter voices for the current language
+      const langVoices = availableVoices.filter((v) =>
         preferredCodes.some((code) => v.lang.toLowerCase().startsWith(code.toLowerCase())),
       );
 
-      if (matchedVoice) {
-        utterance.voice = matchedVoice;
+      // 2. Prioritize clear female voice matching the language
+      const femaleLangVoice = langVoices.find((v) => {
+        const nameLower = v.name.toLowerCase();
+        return FEMALE_VOICE_NAMES.some((fn) => nameLower.includes(fn));
+      });
+
+      // 3. Fallback to any language voice, or a global clear female voice
+      const bestVoice =
+        femaleLangVoice ||
+        langVoices[0] ||
+        availableVoices.find((v) => {
+          const nameLower = v.name.toLowerCase();
+          return FEMALE_VOICE_NAMES.some((fn) => nameLower.includes(fn));
+        });
+
+      if (bestVoice) {
+        utterance.voice = bestVoice;
+        utterance.lang = bestVoice.lang;
+      } else {
+        utterance.lang = preferredCodes[0] || "en-US";
       }
-      utterance.lang = matchedVoice?.lang || preferredCodes[0] || "en-US";
 
       utterance.onstart = () => setSpeaking(true);
       utterance.onend = () => setSpeaking(false);
@@ -59,3 +114,4 @@ export function useSpeech(lang: Language = "en") {
 
   return { speak, stop, speaking, supported };
 }
+
