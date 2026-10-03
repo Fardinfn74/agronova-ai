@@ -28,17 +28,25 @@ export function useSpeech(lang: Language = "en") {
     setSupported(true);
 
     const updateVoices = () => {
-      const v = window.speechSynthesis.getVoices();
-      if (v.length > 0) {
-        voicesRef.current = v;
+      if (typeof window !== "undefined" && "speechSynthesis" in window && typeof window.speechSynthesis.getVoices === "function") {
+        try {
+          const v = window.speechSynthesis.getVoices();
+          if (v && v.length > 0) {
+            voicesRef.current = v;
+          }
+        } catch {
+          // Ignore voice fetch error in strict sandbox
+        }
       }
     };
 
     updateVoices();
-    window.speechSynthesis.onvoiceschanged = updateVoices;
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = updateVoices;
+    }
 
     return () => {
-      if (window.speechSynthesis) {
+      if (typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis) {
         window.speechSynthesis.onvoiceschanged = null;
       }
     };
@@ -46,9 +54,13 @@ export function useSpeech(lang: Language = "en") {
 
   const speak = useCallback(
     (text: string) => {
-      if (!supported || typeof window === "undefined") return;
+      if (!supported || typeof window === "undefined" || !("speechSynthesis" in window)) return;
 
-      window.speechSynthesis.cancel(); // Cancel any ongoing speech
+      try {
+        window.speechSynthesis.cancel(); // Cancel any ongoing speech
+      } catch {
+        // Ignore cancel errors
+      }
 
       // Clean markdown tags, asterisks, hashtags for smooth pronunciation
       const cleanText = text.replace(/[*#_`]/g, "").trim();
@@ -65,7 +77,9 @@ export function useSpeech(lang: Language = "en") {
       const availableVoices =
         voicesRef.current.length > 0
           ? voicesRef.current
-          : window.speechSynthesis.getVoices();
+          : typeof window !== "undefined" && "speechSynthesis" in window && typeof window.speechSynthesis.getVoices === "function"
+            ? window.speechSynthesis.getVoices()
+            : [];
 
       const preferredCodes = LANG_VOICE_MAP[lang] || ["en-US"];
 
