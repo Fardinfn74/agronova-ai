@@ -36,6 +36,7 @@ import {
   Satellite,
   Send,
   Share2,
+  Sparkles,
   Sprout,
   Wifi,
   WifiOff,
@@ -45,6 +46,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { DemoProfile, LiveProfile, AddFieldForm } from "@/components/workspace-live";
 import { useSpeech } from "@/hooks/use-speech";
 import { askNovaAssistant } from "@/lib/ai-assistant";
+import { generateGeminiText, getGeminiApiKey } from "@/lib/gemini";
+
 import {
   getPowerReadings,
   computeFieldInsights,
@@ -474,6 +477,8 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
               openEvidence={setEvidenceIds}
               save={save}
               lang={lang}
+              field={field}
+              nasaData={activeNasaData}
             />
           )}
           {tab === "compare" && <Compare lang={lang} />}
@@ -875,17 +880,115 @@ function RotationLab({
   openEvidence,
   save,
   lang,
+  field,
+  nasaData,
 }: {
   selected: Scenario["id"];
   setSelected: (id: Scenario["id"]) => void;
   openEvidence: (ids: string[]) => void;
   save: () => void;
   lang: Language;
+  field?: DemoField | undefined;
+  nasaData?: PowerReading[] | null | undefined;
 }) {
   const t = translations[lang] || translations.en;
+  const [advisoryLoading, setAdvisoryLoading] = useState(false);
+  const [advisoryText, setAdvisoryText] = useState("");
+  const [copiedAdvisory, setCopiedAdvisory] = useState(false);
+
+  const selectedScenario = scenarios.find((s) => s.id === selected) || scenarios[0]!;
+
+  const handleGenerateAdvisory = async () => {
+    setAdvisoryLoading(true);
+    setAdvisoryText("");
+
+    const recentTemp = nasaData?.slice(-1)[0]?.temperature ?? 29;
+    const recentRain = nasaData?.slice(-7).reduce((acc, r) => acc + (r.rain ?? 0), 0) ?? 12;
+
+    const prompt = `Generate a customized 3-step practical agronomic advisory for a farmer in ${field?.district || "South Asia"} adopting crop rotation plan: "${selectedScenario.name}" (Crops: ${selectedScenario.sequence.join(" -> ")}).
+Field characteristics: Soil: ${field?.soil || "Loam"}, Water access: ${field?.water || "Moderate"}, Current Crop: ${field?.crop || "Rice"}.
+NASA POWER Earth observation context: 7-day cumulative rainfall ${recentRain.toFixed(1)}mm, temperature ${recentTemp}°C.
+
+Structure your response into 3 concise actionable sections in language "${lang}":
+1. 🌾 Sowing Timeline & Soil Prep (How to prepare field and optimal transition date)
+2. 💧 Water & Irrigation Schedule (Grounded in current NASA rainfall trends)
+3. 🛡️ Pest, Disease & Nutrient Cycle Benefits (Why this sequence protects the farmer)
+
+Be encouraging, specific, and grounded for a smallholder farmer.`;
+
+    const systemInstruction = `You are a certified agronomy specialist for the NASA Space Apps Challenge 2026. Keep advice clear, supportive, and accessible for smallholder farmers.`;
+
+    const res = await generateGeminiText(prompt, systemInstruction, 0.5);
+
+    if (res.success && res.text) {
+      setAdvisoryText(res.text);
+    } else {
+      setAdvisoryText(
+        `💡 Agronomic Action Plan: ${selectedScenario.name}\n\n` +
+        `1. 🌾 Sowing & Transition: Plant ${selectedScenario.sequence[1] || "legumes"} immediately following ${selectedScenario.sequence[0] || "rice"} harvest to utilize residual soil moisture.\n` +
+        `2. 💧 Water Management: Current 7-day rainfall is ${recentRain.toFixed(1)}mm. Implement alternate wetting and drying to realize the projected ${selectedScenario.water}/100 water score.\n` +
+        `3. 🛡️ Soil & Pest Defense: Incorporating legumes into this rotation fixes atmospheric nitrogen (${selectedScenario.soil}/100 soil index) and breaks the monoculture pest cycle.\n\n` +
+        `(Powered by AgroNova Agronomy Engine. Add your free Gemini key in Profile for live custom AI reports)`
+      );
+    }
+    setAdvisoryLoading(false);
+  };
+
+  const copyAdvisory = () => {
+    if (!advisoryText) return;
+    navigator.clipboard.writeText(advisoryText);
+    setCopiedAdvisory(true);
+    setTimeout(() => setCopiedAdvisory(false), 2000);
+  };
+
   return (
     <Card kicker={t.rotationStep} title={t.rotationTitle}>
       <p className="text-muted-foreground mb-4 text-sm">{t.pickScenario}</p>
+
+      {/* Gemini AI Scenario Advisory Box */}
+      <div className="clay-card border border-primary/20 p-5 mb-5 bg-gradient-to-br from-card to-primary/5">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-amber-500 animate-pulse" />
+            <h4 className="font-display font-semibold text-base sm:text-lg">
+              Gemini AI Advisory for Plan {selectedScenario.id}: {selectedScenario.name}
+            </h4>
+          </div>
+          <AgroButton
+            size="sm"
+            variant="primary"
+            disabled={advisoryLoading}
+            onClick={handleGenerateAdvisory}
+            className="flex items-center gap-1.5 shadow"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>{advisoryLoading ? "Analyzing..." : "Generate AI Action Plan"}</span>
+          </AgroButton>
+        </div>
+
+        <p className="text-xs text-muted-foreground mb-3">
+          Generates field-tailored recommendations combining your soil profile, selected sequence ({selectedScenario.sequence.join(" → ")}), and NASA satellite observations.
+        </p>
+
+        {advisoryText && (
+          <div className="mt-3 space-y-3">
+            <div className="clay-card-sunken rounded-xl p-4 text-sm leading-relaxed whitespace-pre-wrap">
+              {advisoryText}
+            </div>
+            <div className="flex items-center justify-between">
+              <SpeechButton text={advisoryText.replace(/[*#_`]/g, "")} lang={lang} />
+              <button
+                type="button"
+                onClick={copyAdvisory}
+                className="text-xs text-primary font-medium hover:underline flex items-center gap-1"
+              >
+                {copiedAdvisory ? "✓ Copied to clipboard" : "Copy action plan"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
       <div className="space-y-4">
         {scenarios.map((s) => (
           <div
@@ -950,6 +1053,7 @@ function RotationLab({
     </Card>
   );
 }
+
 
 const metrics = ["water", "rainfall", "temperature", "soil", "resilience", "priority"] as const;
 

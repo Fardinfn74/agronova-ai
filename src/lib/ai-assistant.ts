@@ -1,5 +1,6 @@
 import { novaReply, type Language, type Scenario, type DemoField } from "@/lib/agronova-demo";
 import type { PowerReading } from "@/lib/nasa-power";
+import { generateGeminiText, getGeminiApiKey } from "@/lib/gemini";
 
 export type AiContext = {
   field: DemoField;
@@ -10,7 +11,7 @@ export type AiContext = {
 
 /**
  * Intelligent AgroNova assistant:
- * Attempts to query an LLM provider if configured in environment,
+ * Attempts to query Google Gemini 1.5 Flash (free tier),
  * otherwise provides instant grounded responses via deterministic agronomic engine.
  */
 export async function askNovaAssistant(
@@ -19,49 +20,33 @@ export async function askNovaAssistant(
 ): Promise<string> {
   const { field, scenario, nasaReadings, lang } = context;
 
-  // Check for client or server configured LLM key
-  const apiKey =
-    (typeof import.meta !== "undefined" && import.meta.env?.['VITE_AI_API_KEY']) ||
-    (typeof process !== "undefined" && process.env?.['AI_API_KEY']);
+  const apiKey = getGeminiApiKey();
 
-  if (apiKey && typeof fetch !== "undefined") {
+  if (apiKey) {
     try {
       const recentTemp = nasaReadings?.slice(-1)[0]?.temperature ?? 30;
       const recentRain = nasaReadings?.slice(-7).reduce((acc, r) => acc + (r.rain ?? 0), 0) ?? 15;
+      const recentRh = nasaReadings?.slice(-1)[0]?.humidity ?? 65;
 
-      const systemPrompt = `You are Nova, an AI agricultural decision-support companion for smallholder farmers built for the NASA Space Apps Challenge 2026.
+      const systemPrompt = `You are Nova, an expert AI agricultural decision-support companion for smallholder farmers built for the NASA Space Apps Challenge 2026.
 Field context:
-- Name: ${field.name} (${field.district})
+- Field: ${field.name} (${field.district})
 - Current crop: ${field.crop}, Season: ${field.season}
 - Soil: ${field.soil}, Water access: ${field.water}
-- Selected Rotation: ${scenario.name} (${scenario.sequence.join(" -> ")})
-- NASA POWER Recent Climate: 7-day rain ${recentRain}mm, latest temp ${recentTemp}°C.
+- Selected Rotation: ${scenario.name} (Sequence: ${scenario.sequence.join(" -> ")})
+- Projected Metrics: Water Fit: ${scenario.water}/100, Soil Index: ${scenario.soil}/100, Climate Resilience: ${scenario.resilience}/100
+- NASA POWER Earth Observation Data: 7-day cumulative rainfall ${recentRain.toFixed(1)}mm, current temperature ${recentTemp}°C, relative humidity ${recentRh}%.
+
 Instructions:
-Respond concisely in plain, accessible words suited for a farmer in language: "${lang}". Keep advice practical, supportive, and grounded in the data. Never guarantee exact yields.`;
+- Respond in language: "${lang}".
+- Tone: Supportive, scientifically grounded in agronomy, practical for smallholder farmers.
+- Emphasize actionable steps regarding crop rotation, soil moisture, and weather preparedness.
+- Keep the response concise (2-4 paragraphs maximum). Do not make unrealistic yield guarantees.`;
 
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: question },
-          ],
-          max_tokens: 250,
-          temperature: 0.6,
-        }),
-      });
+      const result = await generateGeminiText(question, systemPrompt, 0.6);
 
-      if (response.ok) {
-        const json = await response.json();
-        const reply = json.choices?.[0]?.message?.content;
-        if (reply && typeof reply === "string") {
-          return reply.trim();
-        }
+      if (result.success && result.text) {
+        return result.text;
       }
     } catch {
       // Fallback silently to deterministic agronomy engine
@@ -71,3 +56,4 @@ Respond concisely in plain, accessible words suited for a farmer in language: "$
   // Instant grounded fallback
   return novaReply(question, lang, scenario);
 }
+

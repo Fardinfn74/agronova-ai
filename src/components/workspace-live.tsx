@@ -1,10 +1,23 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { CloudRain, Droplets, Languages, Plus, Thermometer, UserRound } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  CloudRain,
+  Droplets,
+  ExternalLink,
+  KeyRound,
+  Languages,
+  Plus,
+  Sparkles,
+  Thermometer,
+  UserRound,
+} from "lucide-react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { getPowerReadings, type PowerReading } from "@/lib/nasa-power";
 import { demoFarmer, translations, type DemoField, type Language } from "@/lib/agronova-demo";
 import { AgroButton } from "@/components/agronova-button";
+import { getGeminiApiKey, setGeminiApiKey, testGeminiApiKey } from "@/lib/gemini";
 
 const input = "clay-card-sunken mt-1 w-full px-3 py-2.5 font-normal outline-none focus:ring-2 focus:ring-primary";
 
@@ -15,6 +28,166 @@ const languageOptions: { code: Language; name: string; native: string; flag: str
   { code: "es", name: "Spanish", native: "Español", flag: "🇪🇸" },
   { code: "sw", name: "Swahili", native: "Kiswahili", flag: "🇰🇪" },
 ];
+
+export function GeminiApiKeyCard() {
+  const [key, setKey] = useState("");
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const [savedSuccess, setSavedSuccess] = useState(false);
+
+  useEffect(() => {
+    setKey(getGeminiApiKey());
+  }, []);
+
+  const handleSave = () => {
+    setGeminiApiKey(key.trim());
+    setSavedSuccess(true);
+    setTestResult(null);
+    setTimeout(() => setSavedSuccess(false), 3000);
+  };
+
+  const handleTest = async () => {
+    setTesting(true);
+    setTestResult(null);
+    const result = await testGeminiApiKey(key.trim());
+    setTestResult(result);
+    setTesting(false);
+  };
+
+  const handleClear = () => {
+    setKey("");
+    setGeminiApiKey("");
+    setTestResult(null);
+    setSavedSuccess(false);
+  };
+
+  const hasKey = Boolean(key.trim());
+
+  return (
+    <section className="clay-card p-5 sm:p-6 mt-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-amber-500 animate-pulse" />
+          <h3 className="font-display text-xl">Google Gemini AI Integration</h3>
+        </div>
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 ${
+            hasKey
+              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
+              : "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
+          }`}
+        >
+          {hasKey ? (
+            <>
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              <span>Gemini Ready</span>
+            </>
+          ) : (
+            <>
+              <KeyRound className="h-3.5 w-3.5" />
+              <span>Key Required (Free)</span>
+            </>
+          )}
+        </span>
+      </div>
+
+      <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
+        AgroNova uses <strong>Google Gemini 1.5 Flash</strong> (100% free tier) to power Nova AI Chat,
+        Crop Doctor leaf image pathology, and climate-aware crop rotation recommendations.
+      </p>
+
+      <div className="clay-card-sunken p-4 rounded-xl space-y-3 mb-4">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Gemini API Key
+        </label>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <input
+            type="password"
+            value={key}
+            onChange={(e) => {
+              setKey(e.target.value);
+              setTestResult(null);
+            }}
+            placeholder="AIzaSy..."
+            className="clay-card-sunken flex-1 px-3 py-2 text-sm rounded-lg outline-none font-mono focus:ring-2 focus:ring-primary"
+          />
+          <div className="flex gap-2">
+            <AgroButton
+              type="button"
+              variant="primary"
+              size="sm"
+              onClick={handleSave}
+              className="flex items-center gap-1.5"
+            >
+              <KeyRound className="h-4 w-4" />
+              Save Key
+            </AgroButton>
+            <AgroButton
+              type="button"
+              variant="secondary"
+              size="sm"
+              disabled={testing || !key.trim()}
+              onClick={handleTest}
+              className="flex items-center gap-1.5"
+            >
+              {testing ? "Testing..." : "Test Connection"}
+            </AgroButton>
+            {hasKey && (
+              <AgroButton
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleClear}
+                className="text-xs"
+              >
+                Clear
+              </AgroButton>
+            )}
+          </div>
+        </div>
+
+        {savedSuccess && (
+          <p className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 font-medium">
+            <CheckCircle2 className="h-3.5 w-3.5" /> Key saved successfully to local workspace.
+          </p>
+        )}
+
+        {testResult && (
+          <div
+            className={`p-3 rounded-lg text-xs flex items-start gap-2 ${
+              testResult.ok
+                ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20"
+                : "bg-destructive/10 text-destructive border border-destructive/20"
+            }`}
+          >
+            {testResult.ok ? (
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
+            ) : (
+              <AlertCircle className="h-4 w-4 shrink-0 text-destructive mt-0.5" />
+            )}
+            <div>
+              <p className="font-semibold">{testResult.ok ? "Success!" : "Connection Failed"}</p>
+              <p className="mt-0.5">{testResult.message}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground pt-1">
+        <span>Don't have a key yet? Free keys take 30 seconds to generate.</span>
+        <a
+          href="https://aistudio.google.com/app/apikey"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline"
+        >
+          <span>Get Free Key at Google AI Studio</span>
+          <ExternalLink className="h-3.5 w-3.5" />
+        </a>
+      </div>
+    </section>
+  );
+}
 
 export function LanguageSettingsCard({
   lang = "en",
@@ -131,6 +304,7 @@ export function DemoProfile({
         ]} />
         <p className="text-muted-foreground mt-4 text-xs">This is a sample farmer for the demo. Sign up to create your own profile.</p>
       </Shell>
+      <GeminiApiKeyCard />
       <LanguageSettingsCard lang={lang} onLanguageChange={onLanguageChange} />
     </div>
   );
@@ -173,10 +347,12 @@ export function LiveProfile({
           {msg && <p role="status" className="text-primary text-sm sm:col-span-2">{msg}</p>}
         </form>
       </Shell>
+      <GeminiApiKeyCard />
       <LanguageSettingsCard lang={lang} onLanguageChange={onLanguageChange} />
     </div>
   );
 }
+
 
 export function AddFieldForm({ onAdded, initialCoords }: { onAdded: () => void; initialCoords?: [number, number] | undefined }) {
   const [f, setF] = useState({
