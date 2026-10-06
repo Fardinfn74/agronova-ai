@@ -31,9 +31,10 @@ export function FieldMap({
   useEffect(() => {
     if (!holder.current || map.current) return;
     const instance = L.map(holder.current, { scrollWheelZoom: false }).setView([23.8, 90.2], 7);
-    
+
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 19,
     }).addTo(instance);
 
@@ -50,18 +51,22 @@ export function FieldMap({
         if (clickMarker.current) {
           clickMarker.current.setLatLng(e.latlng);
         } else {
-          clickMarker.current = L.marker(e.latlng).addTo(instance).bindPopup("Selected Point").openPopup();
+          clickMarker.current = L.marker(e.latlng)
+            .addTo(instance)
+            .bindPopup("Selected Point")
+            .openPopup();
         }
       });
     }
 
     const timer = setTimeout(() => instance.invalidateSize(), 150);
 
-    const resizeObserver = typeof ResizeObserver !== "undefined"
-      ? new ResizeObserver(() => {
-          instance.invalidateSize();
-        })
-      : null;
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => {
+            instance.invalidateSize();
+          })
+        : null;
 
     if (resizeObserver && holder.current) {
       resizeObserver.observe(holder.current);
@@ -84,7 +89,7 @@ export function FieldMap({
 
     fields.forEach((field) => {
       const active = field.id === selected;
-      
+
       // Marker
       L.circleMarker(field.coordinates, {
         radius: active ? 12 : 9,
@@ -121,7 +126,7 @@ export function FieldMap({
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`,
-        { headers: { "Accept-Language": "en" } }
+        { headers: { "Accept-Language": "en" } },
       );
       const data = await res.json();
       if (data && data[0]) {

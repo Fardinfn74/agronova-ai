@@ -139,7 +139,11 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   useEffect(() => {
-    if (typeof window !== "undefined" && "serviceWorker" in navigator && process.env['NODE_ENV'] === "production") {
+    if (
+      typeof window !== "undefined" &&
+      "serviceWorker" in navigator &&
+      process.env["NODE_ENV"] === "production"
+    ) {
       navigator.serviceWorker.register("/sw.js").catch(() => {
         // Safe fallback if service workers are blocked
       });
@@ -149,7 +153,7 @@ function RootComponent() {
       const stored = localStorage.getItem("agronova_language");
       if (stored && stored !== "en") {
         import("@/lib/full-translator").then(({ applyFullPageTranslation }) => {
-          applyFullPageTranslation(stored as any);
+          applyFullPageTranslation(stored as Parameters<typeof applyFullPageTranslation>[0]);
         });
       }
     }

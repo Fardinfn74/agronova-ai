@@ -11,11 +11,31 @@ const LANG_VOICE_MAP: Record<Language, string[]> = {
 
 // Female voice name identifiers across Chrome, Edge, Safari, iOS, and Android
 const FEMALE_VOICE_NAMES = [
-  "female", "girl", "woman",
-  "zira", "jenny", "aria", "samantha", "victoria", "karen", "tessa", "moira",
-  "sonia", "heera", "tanvi", "swara", "shreya", "ananya",
-  "elena", "monica", "paulina", "sabina", "tashi", "salma",
-  "google us english", "google uk english female",
+  "female",
+  "girl",
+  "woman",
+  "zira",
+  "jenny",
+  "aria",
+  "samantha",
+  "victoria",
+  "karen",
+  "tessa",
+  "moira",
+  "sonia",
+  "heera",
+  "tanvi",
+  "swara",
+  "shreya",
+  "ananya",
+  "elena",
+  "monica",
+  "paulina",
+  "sabina",
+  "tashi",
+  "salma",
+  "google us english",
+  "google uk english female",
 ];
 
 export function useSpeech(lang: Language = "en") {
@@ -28,7 +48,11 @@ export function useSpeech(lang: Language = "en") {
     setSupported(true);
 
     const updateVoices = () => {
-      if (typeof window !== "undefined" && "speechSynthesis" in window && typeof window.speechSynthesis.getVoices === "function") {
+      if (
+        typeof window !== "undefined" &&
+        "speechSynthesis" in window &&
+        typeof window.speechSynthesis.getVoices === "function"
+      ) {
         try {
           const v = window.speechSynthesis.getVoices();
           if (v && v.length > 0) {
@@ -77,7 +101,9 @@ export function useSpeech(lang: Language = "en") {
       const availableVoices =
         voicesRef.current.length > 0
           ? voicesRef.current
-          : typeof window !== "undefined" && "speechSynthesis" in window && typeof window.speechSynthesis.getVoices === "function"
+          : typeof window !== "undefined" &&
+              "speechSynthesis" in window &&
+              typeof window.speechSynthesis.getVoices === "function"
             ? window.speechSynthesis.getVoices()
             : [];
 
@@ -128,4 +154,3 @@ export function useSpeech(lang: Language = "en") {
 
   return { speak, stop, speaking, supported };
 }
-

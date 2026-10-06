@@ -1,5 +1,6 @@
 # AgroNova 🌱 — AI Farm Companion
-> **NASA International Space Apps Challenge 2026** · *Field Shift Challenge*
+
+> **NASA International Space Apps Challenge 2026** · _Field Shift Challenge_
 
 AgroNova is a climate-adaptive precision agriculture workspace and decision-support companion that empowers smallholder farmers to read their fields with NASA Earth observation satellites and make confident crop rotation and resource decisions.
 
@@ -87,4 +88,3 @@ Visit [http://localhost:8080](http://localhost:8080) for the public landing page
 - **Ramisa Anjum Simi** — Team Member
 - **Ramis Fariha Bhabna** — Team Member
 - **Erina Siddiqua Eram** — Team Member
-

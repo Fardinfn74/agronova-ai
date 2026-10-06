@@ -48,7 +48,9 @@ export function setGeminiApiKey(key: string): void {
 /**
  * Tests connection to Google Gemini API
  */
-export async function testGeminiApiKey(keyToTest?: string): Promise<{ ok: boolean; message: string }> {
+export async function testGeminiApiKey(
+  keyToTest?: string,
+): Promise<{ ok: boolean; message: string }> {
   const key = keyToTest || getGeminiApiKey();
   if (!key) {
     return { ok: false, message: "No Gemini API key found. Enter a key from Google AI Studio." };
@@ -99,7 +101,7 @@ export async function generateGeminiText(
 
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
-    const contents: any[] = [];
+    const contents: Array<{ parts: Array<{ text: string }> }> = [];
 
     let combinedPrompt = prompt;
     if (systemInstruction) {

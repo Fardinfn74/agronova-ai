@@ -11,14 +11,14 @@
 export type FIRMSAlert = {
   latitude: number;
   longitude: number;
-  brightness: number;     // Kelvin — fire radiative power proxy
+  brightness: number; // Kelvin — fire radiative power proxy
   scan: number;
   track: number;
-  acq_date: string;       // "YYYY-MM-DD"
-  acq_time: string;       // "HHMM"
-  satellite: string;      // "N" (NOAA-20), "S" (Suomi NPP), etc.
-  confidence: string;     // "n" (nominal), "h" (high), "l" (low)
-  frp: number;            // Fire Radiative Power MW
+  acq_date: string; // "YYYY-MM-DD"
+  acq_time: string; // "HHMM"
+  satellite: string; // "N" (NOAA-20), "S" (Suomi NPP), etc.
+  confidence: string; // "n" (nominal), "h" (high), "l" (low)
+  frp: number; // Fire Radiative Power MW
   daynight: "D" | "N";
 };
 
@@ -36,18 +36,13 @@ const FIRMS_CACHE_KEY_PREFIX = "firms_fire_";
 const FIRMS_CACHE_TTL = 3 * 60 * 60 * 1000; // 3 hours
 
 /** Haversine distance in km between two lat/lon points */
-function haversineKm(
-  lat1: number, lon1: number,
-  lat2: number, lon2: number,
-): number {
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) ** 2;
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
@@ -70,7 +65,9 @@ export async function getFireAlerts(
         const { timestamp, data } = JSON.parse(cached) as { timestamp: number; data: FireRisk };
         if (Date.now() - timestamp < FIRMS_CACHE_TTL) return data;
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   const apiKey = (import.meta.env as Record<string, string | undefined>)["VITE_FIRMS_MAP_KEY"];
@@ -103,22 +100,25 @@ export async function getFireAlerts(
     }
 
     // Parse CSV (columns: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight)
-    const alerts: FIRMSAlert[] = lines.slice(1).map((line) => {
-      const parts = line.split(",");
-      return {
-        latitude: parseFloat(parts[0] ?? "0"),
-        longitude: parseFloat(parts[1] ?? "0"),
-        brightness: parseFloat(parts[2] ?? "0"),
-        scan: parseFloat(parts[3] ?? "0"),
-        track: parseFloat(parts[4] ?? "0"),
-        acq_date: parts[5] ?? "",
-        acq_time: parts[6] ?? "",
-        satellite: parts[7] ?? "",
-        confidence: parts[9] ?? "n",
-        frp: parseFloat(parts[12] ?? "0"),
-        daynight: (parts[13]?.trim() ?? "D") as "D" | "N",
-      };
-    }).filter((a) => !isNaN(a.latitude) && !isNaN(a.longitude));
+    const alerts: FIRMSAlert[] = lines
+      .slice(1)
+      .map((line) => {
+        const parts = line.split(",");
+        return {
+          latitude: parseFloat(parts[0] ?? "0"),
+          longitude: parseFloat(parts[1] ?? "0"),
+          brightness: parseFloat(parts[2] ?? "0"),
+          scan: parseFloat(parts[3] ?? "0"),
+          track: parseFloat(parts[4] ?? "0"),
+          acq_date: parts[5] ?? "",
+          acq_time: parts[6] ?? "",
+          satellite: parts[7] ?? "",
+          confidence: parts[9] ?? "n",
+          frp: parseFloat(parts[12] ?? "0"),
+          daynight: (parts[13]?.trim() ?? "D") as "D" | "N",
+        };
+      })
+      .filter((a) => !isNaN(a.latitude) && !isNaN(a.longitude));
 
     return buildFireResult(alerts, latitude, longitude, radiusKm, "live", cacheKey);
   } catch {
@@ -176,7 +176,9 @@ function buildFireResult(
   if (typeof window !== "undefined") {
     try {
       localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: result }));
-    } catch { /* storage guard */ }
+    } catch {
+      /* storage guard */
+    }
   }
 
   return result;

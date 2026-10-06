@@ -5,14 +5,14 @@
  */
 
 export type ForecastDay = {
-  date: string;          // ISO date
-  label: string;         // "Mon 04/10"
-  tempMax: number;       // °C
-  tempMin: number;       // °C
-  rain: number;          // mm — total daily rainfall
-  et0: number;           // mm — FAO-56 reference evapotranspiration
-  irrigationNeed: number;// mm — max(0, ET₀ - rain) = net irrigation demand
-  weatherCode: number;   // WMO weather code
+  date: string; // ISO date
+  label: string; // "Mon 04/10"
+  tempMax: number; // °C
+  tempMin: number; // °C
+  rain: number; // mm — total daily rainfall
+  et0: number; // mm — FAO-56 reference evapotranspiration
+  irrigationNeed: number; // mm — max(0, ET₀ - rain) = net irrigation demand
+  weatherCode: number; // WMO weather code
   weatherLabel: string;
   weatherEmoji: string;
   riskLevel: "Low" | "Watch" | "Alert";
@@ -32,18 +32,18 @@ export type ForecastSummary = {
 
 // WMO Weather Interpretation Codes → label + emoji
 function interpretWeatherCode(code: number): { label: string; emoji: string } {
-  if (code === 0)  return { label: "Clear sky", emoji: "☀️" };
-  if (code <= 3)   return { label: "Partly cloudy", emoji: "⛅" };
-  if (code <= 9)   return { label: "Fog", emoji: "🌫️" };
-  if (code <= 19)  return { label: "Drizzle", emoji: "🌦️" };
-  if (code <= 29)  return { label: "Rain", emoji: "🌧️" };
-  if (code <= 39)  return { label: "Snow", emoji: "🌨️" };
-  if (code <= 49)  return { label: "Fog", emoji: "🌫️" };
-  if (code <= 59)  return { label: "Drizzle", emoji: "🌦️" };
-  if (code <= 69)  return { label: "Rain", emoji: "🌧️" };
-  if (code <= 79)  return { label: "Snow", emoji: "❄️" };
-  if (code <= 84)  return { label: "Rain showers", emoji: "🌧️" };
-  if (code <= 94)  return { label: "Thunderstorm", emoji: "⛈️" };
+  if (code === 0) return { label: "Clear sky", emoji: "☀️" };
+  if (code <= 3) return { label: "Partly cloudy", emoji: "⛅" };
+  if (code <= 9) return { label: "Fog", emoji: "🌫️" };
+  if (code <= 19) return { label: "Drizzle", emoji: "🌦️" };
+  if (code <= 29) return { label: "Rain", emoji: "🌧️" };
+  if (code <= 39) return { label: "Snow", emoji: "🌨️" };
+  if (code <= 49) return { label: "Fog", emoji: "🌫️" };
+  if (code <= 59) return { label: "Drizzle", emoji: "🌦️" };
+  if (code <= 69) return { label: "Rain", emoji: "🌧️" };
+  if (code <= 79) return { label: "Snow", emoji: "❄️" };
+  if (code <= 84) return { label: "Rain showers", emoji: "🌧️" };
+  if (code <= 94) return { label: "Thunderstorm", emoji: "⛈️" };
   return { label: "Thunderstorm", emoji: "⛈️" };
 }
 
@@ -67,17 +67,23 @@ export async function get7DayForecast(
     try {
       const cached = localStorage.getItem(cacheKey);
       if (cached) {
-        const { timestamp, data } = JSON.parse(cached) as { timestamp: number; data: ForecastSummary };
+        const { timestamp, data } = JSON.parse(cached) as {
+          timestamp: number;
+          data: ForecastSummary;
+        };
         if (Date.now() - timestamp < FORECAST_CACHE_TTL) return data;
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   const url = new URL("https://api.open-meteo.com/v1/forecast");
   const params: Record<string, string> = {
     latitude: String(latitude),
     longitude: String(longitude),
-    daily: "temperature_2m_max,temperature_2m_min,precipitation_sum,et0_fao_evapotranspiration,weathercode",
+    daily:
+      "temperature_2m_max,temperature_2m_min,precipitation_sum,et0_fao_evapotranspiration,weathercode",
     timezone: "auto",
     forecast_days: "7",
   };
@@ -101,12 +107,12 @@ export async function get7DayForecast(
     if (!d?.time?.length) throw new Error("No forecast data");
 
     const days: ForecastDay[] = d.time.map((date, i) => {
-      const tempMax    = Math.round((d.temperature_2m_max[i] ?? 30) * 10) / 10;
-      const tempMin    = Math.round((d.temperature_2m_min[i] ?? 20) * 10) / 10;
-      const rain       = Math.round((d.precipitation_sum[i] ?? 0) * 10) / 10;
-      const et0        = Math.round((d.et0_fao_evapotranspiration[i] ?? 4) * 10) / 10;
+      const tempMax = Math.round((d.temperature_2m_max[i] ?? 30) * 10) / 10;
+      const tempMin = Math.round((d.temperature_2m_min[i] ?? 20) * 10) / 10;
+      const rain = Math.round((d.precipitation_sum[i] ?? 0) * 10) / 10;
+      const et0 = Math.round((d.et0_fao_evapotranspiration[i] ?? 4) * 10) / 10;
       const irrigationNeed = Math.round(Math.max(0, et0 - rain) * 10) / 10;
-      const code       = d.weathercode[i] ?? 0;
+      const code = d.weathercode[i] ?? 0;
       const { label: weatherLabel, emoji: weatherEmoji } = interpretWeatherCode(code);
 
       let riskLevel: ForecastDay["riskLevel"] = "Low";
@@ -130,22 +136,35 @@ export async function get7DayForecast(
       }
 
       return {
-        date, label: dayLabel(date),
-        tempMax, tempMin, rain, et0, irrigationNeed,
-        weatherCode: code, weatherLabel, weatherEmoji,
-        riskLevel, riskReason,
+        date,
+        label: dayLabel(date),
+        tempMax,
+        tempMin,
+        rain,
+        et0,
+        irrigationNeed,
+        weatherCode: code,
+        weatherLabel,
+        weatherEmoji,
+        riskLevel,
+        riskReason,
       };
     });
 
     const totalRain7d = Math.round(days.reduce((s, d) => s + d.rain, 0) * 10) / 10;
-    const totalET7d   = Math.round(days.reduce((s, d) => s + d.et0, 0) * 10) / 10;
-    const totalIrrigationNeed = Math.round(days.reduce((s, d) => s + d.irrigationNeed, 0) * 10) / 10;
-    const peakTempDay = days.reduce((a, b) => a.tempMax > b.tempMax ? a : b, days[0]!) ?? null;
-    const highestRainDay = days.reduce((a, b) => a.rain > b.rain ? a : b, days[0]!) ?? null;
+    const totalET7d = Math.round(days.reduce((s, d) => s + d.et0, 0) * 10) / 10;
+    const totalIrrigationNeed =
+      Math.round(days.reduce((s, d) => s + d.irrigationNeed, 0) * 10) / 10;
+    const peakTempDay = days.reduce((a, b) => (a.tempMax > b.tempMax ? a : b), days[0]!) ?? null;
+    const highestRainDay = days.reduce((a, b) => (a.rain > b.rain ? a : b), days[0]!) ?? null;
 
     const result: ForecastSummary = {
-      days, totalRain7d, totalET7d, totalIrrigationNeed,
-      peakTempDay, highestRainDay,
+      days,
+      totalRain7d,
+      totalET7d,
+      totalIrrigationNeed,
+      peakTempDay,
+      highestRainDay,
       source: "live",
       fetchedAt: new Date().toISOString(),
     };
@@ -153,7 +172,9 @@ export async function get7DayForecast(
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: result }));
-      } catch { /* storage guard */ }
+      } catch {
+        /* storage guard */
+      }
     }
 
     return result;
