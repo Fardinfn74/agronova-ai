@@ -1,9 +1,5 @@
 import { useMemo, useState, useRef } from "react";
-import {
-  cropDiseases,
-  type CropDisease,
-  type Language,
-} from "@/lib/agronova-demo";
+import { cropDiseases, type CropDisease, type Language } from "@/lib/agronova-demo";
 import {
   Stethoscope,
   ChevronDown,
@@ -24,7 +20,6 @@ import { diagnoseCropImage, getGeminiApiKey } from "@/lib/gemini";
 import { AgroButton } from "@/components/agronova-button";
 import { useSpeech } from "@/hooks/use-speech";
 
-
 const severityColor: Record<CropDisease["severity"], string> = {
   High: "bg-destructive/15 text-destructive border-destructive/30",
   Medium: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
@@ -39,13 +34,24 @@ const causeColor: Record<CropDisease["cause"], string> = {
   Pest: "bg-amber-500/15 text-amber-700 dark:text-amber-400",
 };
 
-function DiseaseCard({ disease, defaultOpen = false }: { disease: CropDisease; defaultOpen?: boolean }) {
+function DiseaseCard({
+  disease,
+  defaultOpen = false,
+}: {
+  disease: CropDisease;
+  defaultOpen?: boolean;
+}) {
   const [open, setOpen] = useState(defaultOpen);
   const causeEmoji =
-    disease.cause === "Fungal" ? "🍄" :
-    disease.cause === "Bacterial" ? "🦠" :
-    disease.cause === "Viral" ? "⚠️" :
-    disease.cause === "Pest" ? "🐛" : "🧪";
+    disease.cause === "Fungal"
+      ? "🍄"
+      : disease.cause === "Bacterial"
+        ? "🦠"
+        : disease.cause === "Viral"
+          ? "⚠️"
+          : disease.cause === "Pest"
+            ? "🐛"
+            : "🧪";
 
   return (
     <div className={`clay-card border ${severityColor[disease.severity]} overflow-hidden`}>
@@ -59,22 +65,32 @@ function DiseaseCard({ disease, defaultOpen = false }: { disease: CropDisease; d
           <div>
             <p className="font-semibold">{disease.name}</p>
             <div className="mt-0.5 flex items-center gap-2">
-              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${causeColor[disease.cause]}`}>
+              <span
+                className={`rounded-full px-2 py-0.5 text-xs font-medium ${causeColor[disease.cause]}`}
+              >
                 {disease.cause}
               </span>
-              <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${severityColor[disease.severity]}`}>
+              <span
+                className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${severityColor[disease.severity]}`}
+              >
                 {disease.severity} risk
               </span>
             </div>
           </div>
         </div>
-        {open ? <ChevronUp className="h-4 w-4 shrink-0 opacity-60" /> : <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />}
+        {open ? (
+          <ChevronUp className="h-4 w-4 shrink-0 opacity-60" />
+        ) : (
+          <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />
+        )}
       </button>
 
       {open && (
         <div className="space-y-4 border-t border-current/10 p-4 pt-3">
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-60">What to look for</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-60">
+              What to look for
+            </p>
             <ul className="space-y-1">
               {disease.visualCues.map((cue) => (
                 <li key={cue} className="flex items-start gap-2 text-sm">
@@ -86,17 +102,23 @@ function DiseaseCard({ disease, defaultOpen = false }: { disease: CropDisease; d
           </div>
 
           <div className="clay-card-sunken rounded-xl p-3">
-            <p className="mb-1 text-xs font-semibold uppercase tracking-wide opacity-60">Triggering conditions</p>
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wide opacity-60">
+              Triggering conditions
+            </p>
             <p className="text-sm">{disease.conditions}</p>
           </div>
 
           <div>
-            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide opacity-60">🩺 Treatment now</p>
+            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide opacity-60">
+              🩺 Treatment now
+            </p>
             <p className="text-sm">{disease.treatment}</p>
           </div>
 
           <div>
-            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide opacity-60">🛡️ Prevention</p>
+            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide opacity-60">
+              🛡️ Prevention
+            </p>
             <p className="text-sm">{disease.prevention}</p>
           </div>
 
@@ -200,7 +222,9 @@ export function CropDoctor({ lang }: { lang: Language }) {
 
   // Gemini Vision state
   const [visionCrop, setVisionCrop] = useState("Tomato");
-  const [visionSymptoms, setVisionSymptoms] = useState("Brown circular spots on lower leaves with yellow halo");
+  const [visionSymptoms, setVisionSymptoms] = useState(
+    "Brown circular spots on lower leaves with yellow halo",
+  );
   const [imageDataUrl, setImageDataUrl] = useState<string>("");
   const [imageMime, setImageMime] = useState<string>("image/jpeg");
   const [analyzing, setAnalyzing] = useState(false);
@@ -218,7 +242,8 @@ export function CropDoctor({ lang }: { lang: Language }) {
     const q = query.toLowerCase();
     return cropDiseases.filter((d) => {
       const cropMatch =
-        !selectedCrop || selectedCrop === "All crops" ||
+        !selectedCrop ||
+        selectedCrop === "All crops" ||
         d.crops.some((c) => c.toLowerCase() === selectedCrop.toLowerCase());
       if (!q) return cropMatch;
       return (
@@ -250,7 +275,7 @@ export function CropDoctor({ lang }: { lang: Language }) {
     reader.readAsDataURL(file);
   };
 
-  const loadSample = async (sample: typeof SAMPLE_LEAF_SAMPLES[0]) => {
+  const loadSample = async (sample: (typeof SAMPLE_LEAF_SAMPLES)[0]) => {
     setVisionCrop(sample.crop);
     setVisionSymptoms(sample.symptoms);
     setAiReport("");
@@ -277,7 +302,9 @@ export function CropDoctor({ lang }: { lang: Language }) {
     if (res.success && res.text) {
       setAiReport(res.text);
     } else {
-      setAiReport(`⚠️ AI Diagnosis Note:\n${res.error || "Could not complete Gemini Vision diagnosis. Please check your API key in Profile settings."}`);
+      setAiReport(
+        `⚠️ AI Diagnosis Note:\n${res.error || "Could not complete Gemini Vision diagnosis. Please check your API key in Profile settings."}`,
+      );
     }
     setAnalyzing(false);
   };
@@ -318,7 +345,8 @@ export function CropDoctor({ lang }: { lang: Language }) {
               </span>
             </div>
             <p className="text-muted-foreground text-sm">
-              Instant plant pathology diagnosis via leaf photo analysis &amp; verified agronomic database.
+              Instant plant pathology diagnosis via leaf photo analysis &amp; verified agronomic
+              database.
             </p>
           </div>
         </div>
@@ -359,7 +387,8 @@ export function CropDoctor({ lang }: { lang: Language }) {
             <div className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-amber-500" />
               <span>
-                <strong>Google Gemini 1.5 Flash Vision:</strong> Upload a photo of an unhealthy leaf to detect fungal, bacterial, viral or nutrient stress.
+                <strong>Google Gemini 1.5 Flash Vision:</strong> Upload a photo of an unhealthy leaf
+                to detect fungal, bacterial, viral or nutrient stress.
               </span>
             </div>
             {!hasApiKey && (
@@ -435,10 +464,14 @@ export function CropDoctor({ lang }: { lang: Language }) {
                       onClick={() => loadSample(sample)}
                       className="clay-card hover:border-primary p-2 text-left transition-all group"
                     >
-                      <div className={`h-12 w-full rounded-lg bg-gradient-to-br ${sample.previewBg} flex items-center justify-center border border-white/10 group-hover:scale-105 transition-transform`}>
+                      <div
+                        className={`h-12 w-full rounded-lg bg-gradient-to-br ${sample.previewBg} flex items-center justify-center border border-white/10 group-hover:scale-105 transition-transform`}
+                      >
                         <span className="text-lg">🍃</span>
                       </div>
-                      <p className="mt-1.5 text-[11px] font-semibold leading-tight line-clamp-1">{sample.name}</p>
+                      <p className="mt-1.5 text-[11px] font-semibold leading-tight line-clamp-1">
+                        {sample.name}
+                      </p>
                       <p className="text-[10px] text-muted-foreground">{sample.crop}</p>
                     </button>
                   ))}
@@ -512,9 +545,13 @@ export function CropDoctor({ lang }: { lang: Language }) {
                         size="sm"
                         variant={isSpeakingNova ? "primary" : "secondary"}
                         onClick={toggleSpeakReport}
-                        title={isSpeakingNova ? "Stop voice" : "Read diagnosis aloud in Nova's voice"}
+                        title={
+                          isSpeakingNova ? "Stop voice" : "Read diagnosis aloud in Nova's voice"
+                        }
                       >
-                        <Volume2 className={`h-3.5 w-3.5 ${isSpeakingNova ? "animate-pulse" : ""}`} />
+                        <Volume2
+                          className={`h-3.5 w-3.5 ${isSpeakingNova ? "animate-pulse" : ""}`}
+                        />
                       </AgroButton>
                       <AgroButton
                         type="button"
@@ -523,7 +560,11 @@ export function CropDoctor({ lang }: { lang: Language }) {
                         onClick={copyReport}
                         title="Copy to clipboard"
                       >
-                        {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+                        {copied ? (
+                          <Check className="h-3.5 w-3.5 text-emerald-600" />
+                        ) : (
+                          <Copy className="h-3.5 w-3.5" />
+                        )}
                         <span className="text-xs">{copied ? "Copied" : "Copy"}</span>
                       </AgroButton>
                     </div>
@@ -538,7 +579,8 @@ export function CropDoctor({ lang }: { lang: Language }) {
                     </div>
                     <p className="font-semibold">Examining cellular leaf pathology...</p>
                     <p className="text-xs text-muted-foreground mt-1 max-w-xs">
-                      Consulting Gemini 1.5 Flash multimodal vision against agricultural knowledge base
+                      Consulting Gemini 1.5 Flash multimodal vision against agricultural knowledge
+                      base
                     </p>
                   </div>
                 ) : aiReport ? (
@@ -548,7 +590,10 @@ export function CropDoctor({ lang }: { lang: Language }) {
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground pt-1">
                       <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                      <span>Always cross-check severe field outbreaks with your district agricultural extension officer.</span>
+                      <span>
+                        Always cross-check severe field outbreaks with your district agricultural
+                        extension officer.
+                      </span>
                     </div>
                   </div>
                 ) : (
@@ -558,7 +603,9 @@ export function CropDoctor({ lang }: { lang: Language }) {
                     </div>
                     <h5 className="font-semibold text-foreground">No Diagnosis Yet</h5>
                     <p className="mt-1 text-xs max-w-sm">
-                      Upload a photo or pick a sample leaf on the left, then click <strong>"Diagnose Leaf with Gemini Vision"</strong> to receive an immediate plant pathology evaluation.
+                      Upload a photo or pick a sample leaf on the left, then click{" "}
+                      <strong>"Diagnose Leaf with Gemini Vision"</strong> to receive an immediate
+                      plant pathology evaluation.
                     </p>
                   </div>
                 )}
@@ -575,7 +622,8 @@ export function CropDoctor({ lang }: { lang: Language }) {
           <div className="clay-card-sunken flex items-start gap-2 rounded-xl p-3 text-sm">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
             <p className="text-muted-foreground">
-              Decision-support reference based on agronomy. Confirm critical diagnoses with your local agricultural extension office.
+              Decision-support reference based on agronomy. Confirm critical diagnoses with your
+              local agricultural extension office.
             </p>
           </div>
 
@@ -585,12 +633,17 @@ export function CropDoctor({ lang }: { lang: Language }) {
               <label className="mb-1.5 block text-sm font-semibold">Your crop</label>
               <select
                 value={selectedCrop}
-                onChange={(e) => { setSelectedCrop(e.target.value); setSearched(true); }}
+                onChange={(e) => {
+                  setSelectedCrop(e.target.value);
+                  setSearched(true);
+                }}
                 className="clay-card-sunken w-full rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="">Select crop…</option>
                 {cropNames.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
                 ))}
               </select>
             </div>
@@ -600,7 +653,9 @@ export function CropDoctor({ lang }: { lang: Language }) {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") setSearched(true); }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") setSearched(true);
+                }}
                 placeholder="yellow leaves, brown spots, curling…"
                 className="clay-card-sunken w-full rounded-xl px-3 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
@@ -609,13 +664,27 @@ export function CropDoctor({ lang }: { lang: Language }) {
 
           {/* Quick symptom tags */}
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Quick tags</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Quick tags
+            </p>
             <div className="flex flex-wrap gap-2">
-              {["yellow leaves", "brown spots", "curling", "white patches", "rotting", "stunted growth", "dead shoots", "lesions"].map((tag) => (
+              {[
+                "yellow leaves",
+                "brown spots",
+                "curling",
+                "white patches",
+                "rotting",
+                "stunted growth",
+                "dead shoots",
+                "lesions",
+              ].map((tag) => (
                 <button
                   key={tag}
                   type="button"
-                  onClick={() => { setQuery(tag); setSearched(true); }}
+                  onClick={() => {
+                    setQuery(tag);
+                    setSearched(true);
+                  }}
                   className={`clay-chip rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                     query === tag
                       ? "bg-primary text-primary-foreground"
@@ -640,7 +709,11 @@ export function CropDoctor({ lang }: { lang: Language }) {
             {(searched || query || selectedCrop) && (
               <button
                 type="button"
-                onClick={() => { setQuery(""); setSelectedCrop(""); setSearched(false); }}
+                onClick={() => {
+                  setQuery("");
+                  setSelectedCrop("");
+                  setSearched(false);
+                }}
                 className="clay-btn bg-secondary px-5 py-2.5 text-sm font-semibold text-secondary-foreground"
               >
                 Clear
@@ -657,14 +730,16 @@ export function CropDoctor({ lang }: { lang: Language }) {
                   <div>
                     <p className="font-semibold">No matching conditions found</p>
                     <p className="mt-0.5 text-sm text-muted-foreground">
-                      Try different keywords or select another crop. If symptoms persist, contact your extension officer.
+                      Try different keywords or select another crop. If symptoms persist, contact
+                      your extension officer.
                     </p>
                   </div>
                 </div>
               ) : (
                 <>
                   <p className="text-sm font-medium text-muted-foreground">
-                    {results.length} possible {results.length === 1 ? "condition" : "conditions"} found
+                    {results.length} possible {results.length === 1 ? "condition" : "conditions"}{" "}
+                    found
                   </p>
                   {results.map((d, i) => (
                     <DiseaseCard key={d.id} disease={d} defaultOpen={i === 0} />
@@ -674,7 +749,9 @@ export function CropDoctor({ lang }: { lang: Language }) {
             </div>
           ) : (
             <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Browse all conditions</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Browse all conditions
+              </p>
               {cropDiseases.map((d) => (
                 <DiseaseCard key={d.id} disease={d} />
               ))}
@@ -685,4 +762,3 @@ export function CropDoctor({ lang }: { lang: Language }) {
     </div>
   );
 }
-

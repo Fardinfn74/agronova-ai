@@ -42,7 +42,10 @@ function PricingPage() {
             <Link to="/demo" className="clay-btn bg-secondary px-5 py-2.5 text-sm font-semibold">
               Try Demo
             </Link>
-            <Link to="/auth" className="clay-btn bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">
+            <Link
+              to="/auth"
+              className="clay-btn bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+            >
               Sign up free
             </Link>
           </div>

@@ -14,12 +14,55 @@ export type AiContext = {
  * soil, irrigation, plant pathology, fertilizers, or NASA earth climate data.
  */
 const NON_AGRI_KEYWORDS = [
-  "code", "python", "javascript", "react", "html", "css", "sql", "programming", "software",
-  "movie", "actor", "actress", "cinema", "song", "music", "album", "singer", "hollywood", "bollywood",
-  "football", "soccer", "cricket", "basketball", "messi", "ronaldo", "game", "gaming", "playstation",
-  "crypto", "bitcoin", "ethereum", "stock market", "forex", "trading",
-  "politics", "president", "minister", "election", "parliament", "war", "military",
-  "physics", "quantum", "essay", "homework", "math", "calculus", "joke", "story",
+  "code",
+  "python",
+  "javascript",
+  "react",
+  "html",
+  "css",
+  "sql",
+  "programming",
+  "software",
+  "movie",
+  "actor",
+  "actress",
+  "cinema",
+  "song",
+  "music",
+  "album",
+  "singer",
+  "hollywood",
+  "bollywood",
+  "football",
+  "soccer",
+  "cricket",
+  "basketball",
+  "messi",
+  "ronaldo",
+  "game",
+  "gaming",
+  "playstation",
+  "crypto",
+  "bitcoin",
+  "ethereum",
+  "stock market",
+  "forex",
+  "trading",
+  "politics",
+  "president",
+  "minister",
+  "election",
+  "parliament",
+  "war",
+  "military",
+  "physics",
+  "quantum",
+  "essay",
+  "homework",
+  "math",
+  "calculus",
+  "joke",
+  "story",
 ];
 
 export function isNonAgriculturalQuestion(query: string): boolean {
@@ -28,15 +71,86 @@ export function isNonAgriculturalQuestion(query: string): boolean {
 
   // Agricultural keywords take precedence
   const AGRI_TERMS = [
-    "crop", "farm", "field", "soil", "seed", "plant", "water", "rain", "irrigation",
-    "rice", "wheat", "maize", "potato", "tomato", "mustard", "mungbean", "lentil", "jute",
-    "pest", "disease", "fertilizer", "urea", "nitrogen", "npk", "fungus", "blight", "rust",
-    "rot", "yield", "rotation", "harvest", "sowing", "weather", "nasa", "smap", "power",
-    "gpm", "climate", "temp", "humidity", "moisture", "drought", "flood", "loam", "clay",
-    "কৃষি", "ফসল", "জমি", "মাটি", "ধান", "গম", "সার", "কীটপতঙ্গ", "বৃষ্টি", "আবর্তন",
-    "खेती", "फसल", "खेत", "मिट्टी", "धान", "गेहूं", "उर्वरक", "कीट", "बारिश", "चक्र",
-    "agricultura", "cultivo", "suelo", "riego", "plaga", "enfermedad", "clima", "cosecha",
-    "kilimo", "mazao", "udongo", "maji", "mvua", "wadudu", "mbolea",
+    "crop",
+    "farm",
+    "field",
+    "soil",
+    "seed",
+    "plant",
+    "water",
+    "rain",
+    "irrigation",
+    "rice",
+    "wheat",
+    "maize",
+    "potato",
+    "tomato",
+    "mustard",
+    "mungbean",
+    "lentil",
+    "jute",
+    "pest",
+    "disease",
+    "fertilizer",
+    "urea",
+    "nitrogen",
+    "npk",
+    "fungus",
+    "blight",
+    "rust",
+    "rot",
+    "yield",
+    "rotation",
+    "harvest",
+    "sowing",
+    "weather",
+    "nasa",
+    "smap",
+    "power",
+    "gpm",
+    "climate",
+    "temp",
+    "humidity",
+    "moisture",
+    "drought",
+    "flood",
+    "loam",
+    "clay",
+    "কৃষি",
+    "ফসল",
+    "জমি",
+    "মাটি",
+    "ধান",
+    "গম",
+    "সার",
+    "কীটপতঙ্গ",
+    "বৃষ্টি",
+    "আবর্তন",
+    "खेती",
+    "फसल",
+    "खेत",
+    "मिट्टी",
+    "धान",
+    "गेहूं",
+    "उर्वरक",
+    "कीट",
+    "बारिश",
+    "चक्र",
+    "agricultura",
+    "cultivo",
+    "suelo",
+    "riego",
+    "plaga",
+    "enfermedad",
+    "clima",
+    "cosecha",
+    "kilimo",
+    "mazao",
+    "udongo",
+    "maji",
+    "mvua",
+    "wadudu",
+    "mbolea",
   ];
 
   const hasAgriTerm = AGRI_TERMS.some((term) => clean.includes(term));
@@ -53,10 +167,7 @@ export function isNonAgriculturalQuestion(query: string): boolean {
  * Trained as a certified agricultural and climate-smart farming specialist.
  * Strictly answers farming and NASA Earth observation questions.
  */
-export async function askNovaAssistant(
-  question: string,
-  context: AiContext,
-): Promise<string> {
+export async function askNovaAssistant(question: string, context: AiContext): Promise<string> {
   const { field, scenario, nasaReadings, lang } = context;
 
   // Immediate guardrail check for obvious non-agricultural queries
@@ -72,9 +183,10 @@ export async function askNovaAssistant(
       const last7 = nasaReadings?.slice(-7) ?? [];
       const recentRain = last7.length > 0 ? last7.reduce((acc, r) => acc + (r.rain ?? 0), 0) : 15;
       const recentRh = nasaReadings?.slice(-1)[0]?.humidity ?? 65;
-      const recentSolar = last7.length > 0 ? last7.reduce((acc, r) => acc + (r.solar ?? 0), 0) / last7.length : 18.5;
+      const recentSolar =
+        last7.length > 0 ? last7.reduce((acc, r) => acc + (r.solar ?? 0), 0) / last7.length : 18.5;
       const lat = field.coordinates?.[0] ?? 24.37;
-      const lon = field.coordinates?.[1] ?? 88.60;
+      const lon = field.coordinates?.[1] ?? 88.6;
 
       const systemPrompt = `You are Nova, an AI Senior Agronomist and Climate-Smart Agriculture Specialist built for the NASA Space Apps Challenge 2026.
 Your sole purpose is providing grounded, scientific, and practical agricultural decision-support to smallholder farmers and agriculturalists using real-time NASA Earth Observation data.
@@ -137,5 +249,3 @@ Your sole purpose is providing grounded, scientific, and practical agricultural 
   // Instant grounded fallback
   return novaReply(question, lang, scenario);
 }
-
-

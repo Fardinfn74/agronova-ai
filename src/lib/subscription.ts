@@ -117,29 +117,131 @@ export const SUBSCRIPTION_PLANS: PlanItem[] = [
 
 export const COMPARISON_FEATURES: PlanFeature[] = [
   // Satellite & Observations
-  { category: "satellite", name: "NASA POWER Agroclimatology (Temp, Rain, Solar)", free: true, pro: true, enterprise: true },
-  { category: "satellite", name: "Soil Moisture & Evaporation Indicators", free: "Standard", pro: "High Precision", enterprise: "Root-zone + Surface" },
-  { category: "satellite", name: "Satellite Data Freshness", free: "Daily sync", pro: "Near-Real-Time", enterprise: "High-Priority Queue" },
-  { category: "satellite", name: "Interactive OpenStreetMap Field Picker", free: true, pro: true, enterprise: true },
-  { category: "satellite", name: "GIS Shapefile & GeoJSON Polygon Import", free: false, pro: false, enterprise: true },
+  {
+    category: "satellite",
+    name: "NASA POWER Agroclimatology (Temp, Rain, Solar)",
+    free: true,
+    pro: true,
+    enterprise: true,
+  },
+  {
+    category: "satellite",
+    name: "Soil Moisture & Evaporation Indicators",
+    free: "Standard",
+    pro: "High Precision",
+    enterprise: "Root-zone + Surface",
+  },
+  {
+    category: "satellite",
+    name: "Satellite Data Freshness",
+    free: "Daily sync",
+    pro: "Near-Real-Time",
+    enterprise: "High-Priority Queue",
+  },
+  {
+    category: "satellite",
+    name: "Interactive OpenStreetMap Field Picker",
+    free: true,
+    pro: true,
+    enterprise: true,
+  },
+  {
+    category: "satellite",
+    name: "GIS Shapefile & GeoJSON Polygon Import",
+    free: false,
+    pro: false,
+    enterprise: true,
+  },
 
   // AI & Agronomy
-  { category: "ai", name: "Deterministic Crop Rotation Engine", free: true, pro: true, enterprise: true },
-  { category: "ai", name: "Nova AI Agronomist Voice & Chat", free: "Basic (20/mo)", pro: "Unlimited", enterprise: "Custom Tuned Models" },
-  { category: "ai", name: "5-Language Native Voice Synthesis (TTS)", free: true, pro: true, enterprise: true },
-  { category: "ai", name: "Microclimate Pest & Blight Watch", free: "General", pro: "Precision Micro-alert", enterprise: "Regional Risk Map" },
-  { category: "ai", name: "Climate Stress & Drought Simulator", free: "Preset", pro: "Full Interactive", enterprise: "Custom Scenarios" },
+  {
+    category: "ai",
+    name: "Deterministic Crop Rotation Engine",
+    free: true,
+    pro: true,
+    enterprise: true,
+  },
+  {
+    category: "ai",
+    name: "Nova AI Agronomist Voice & Chat",
+    free: "Basic (20/mo)",
+    pro: "Unlimited",
+    enterprise: "Custom Tuned Models",
+  },
+  {
+    category: "ai",
+    name: "5-Language Native Voice Synthesis (TTS)",
+    free: true,
+    pro: true,
+    enterprise: true,
+  },
+  {
+    category: "ai",
+    name: "Microclimate Pest & Blight Watch",
+    free: "General",
+    pro: "Precision Micro-alert",
+    enterprise: "Regional Risk Map",
+  },
+  {
+    category: "ai",
+    name: "Climate Stress & Drought Simulator",
+    free: "Preset",
+    pro: "Full Interactive",
+    enterprise: "Custom Scenarios",
+  },
 
   // Management & Export
-  { category: "management", name: "Saved Farm Fields", free: "1 field", pro: "Unlimited", enterprise: "500+ fields" },
-  { category: "management", name: "Multi-farmer Extension Officer Dashboard", free: false, pro: false, enterprise: true },
-  { category: "management", name: "Export & Print Crop Plans", free: "Browser Print", pro: "One-Click PDF Dossier", enterprise: "Custom Branded PDF + CSV" },
-  { category: "management", name: "Offline PWA & Low-Bandwidth Mode", free: true, pro: true, enterprise: true },
+  {
+    category: "management",
+    name: "Saved Farm Fields",
+    free: "1 field",
+    pro: "Unlimited",
+    enterprise: "500+ fields",
+  },
+  {
+    category: "management",
+    name: "Multi-farmer Extension Officer Dashboard",
+    free: false,
+    pro: false,
+    enterprise: true,
+  },
+  {
+    category: "management",
+    name: "Export & Print Crop Plans",
+    free: "Browser Print",
+    pro: "One-Click PDF Dossier",
+    enterprise: "Custom Branded PDF + CSV",
+  },
+  {
+    category: "management",
+    name: "Offline PWA & Low-Bandwidth Mode",
+    free: true,
+    pro: true,
+    enterprise: true,
+  },
 
   // Support & Integration
-  { category: "support", name: "Developer & Agronomy REST API", free: false, pro: false, enterprise: true },
-  { category: "support", name: "SMS / WhatsApp Automated Alerts", free: false, pro: "Early Access", enterprise: "Full Mass Broadcast" },
-  { category: "support", name: "Support Level", free: "Community", pro: "Priority Email", enterprise: "Dedicated Agronomist & SLA" },
+  {
+    category: "support",
+    name: "Developer & Agronomy REST API",
+    free: false,
+    pro: false,
+    enterprise: true,
+  },
+  {
+    category: "support",
+    name: "SMS / WhatsApp Automated Alerts",
+    free: false,
+    pro: "Early Access",
+    enterprise: "Full Mass Broadcast",
+  },
+  {
+    category: "support",
+    name: "Support Level",
+    free: "Community",
+    pro: "Priority Email",
+    enterprise: "Dedicated Agronomist & SLA",
+  },
 ];
 
 export const SUBSCRIPTION_STORAGE_KEY = "agronova_user_plan";
@@ -152,11 +254,16 @@ export function getStoredUserPlan(): { plan: PlanTier; cycle: BillingCycle; upgr
     const raw = localStorage.getItem(SUBSCRIPTION_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed && (parsed.plan === "free" || parsed.plan === "pro" || parsed.plan === "enterprise")) {
+      if (
+        parsed &&
+        (parsed.plan === "free" || parsed.plan === "pro" || parsed.plan === "enterprise")
+      ) {
         return parsed;
       }
     }
-  } catch {}
+  } catch {
+    // Ignore storage errors
+  }
   return { plan: "free", cycle: "monthly" };
 }
 
@@ -172,7 +279,9 @@ export function saveStoredUserPlan(plan: PlanTier, cycle: BillingCycle = "monthl
       }),
     );
     window.dispatchEvent(new Event("agronova_plan_updated"));
-  } catch {}
+  } catch {
+    // Ignore storage errors
+  }
 }
 
 export function formatPrice(

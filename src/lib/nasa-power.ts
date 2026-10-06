@@ -1,13 +1,13 @@
 export type PowerReading = {
   date: string;
-  temperature: number | null;        // T2M — mean temp at 2m °C
-  tempMax: number | null;            // T2M_MAX — daily max temp °C
-  tempMin: number | null;            // T2M_MIN — daily min temp °C
-  rain: number | null;               // PRECTOTCORR — corrected precipitation mm/day
-  humidity: number | null;           // RH2M — relative humidity %
-  solar: number | null;              // ALLSKY_SFC_SW_DWN — solar radiation kWh/m²/day
-  windSpeed: number | null;          // WS10M — wind speed m/s at 10m
-  dewPoint: number | null;           // T2MDEW — dew/frost point °C
+  temperature: number | null; // T2M — mean temp at 2m °C
+  tempMax: number | null; // T2M_MAX — daily max temp °C
+  tempMin: number | null; // T2M_MIN — daily min temp °C
+  rain: number | null; // PRECTOTCORR — corrected precipitation mm/day
+  humidity: number | null; // RH2M — relative humidity %
+  solar: number | null; // ALLSKY_SFC_SW_DWN — solar radiation kWh/m²/day
+  windSpeed: number | null; // WS10M — wind speed m/s at 10m
+  dewPoint: number | null; // T2MDEW — dew/frost point °C
   evapotranspiration: number | null; // EVPTRNS — evapotranspiration mm/day
 };
 
@@ -50,8 +50,7 @@ const CACHE_KEY_PREFIX = "nasa_power_cache_";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 // 9 NASA POWER agroclimatology variables (API limit is 20 per request)
-const POWER_PARAMS =
-  "T2M,T2M_MAX,T2M_MIN,PRECTOTCORR,RH2M,ALLSKY_SFC_SW_DWN,WS10M,T2MDEW,EVPTRNS";
+const POWER_PARAMS = "T2M,T2M_MAX,T2M_MIN,PRECTOTCORR,RH2M,ALLSKY_SFC_SW_DWN,WS10M,T2MDEW,EVPTRNS";
 
 export async function getPowerReadings(
   latitude: number,
@@ -63,7 +62,10 @@ export async function getPowerReadings(
     try {
       const cached = localStorage.getItem(cacheKey);
       if (cached) {
-        const { timestamp, data } = JSON.parse(cached) as { timestamp: number; data: PowerReading[] };
+        const { timestamp, data } = JSON.parse(cached) as {
+          timestamp: number;
+          data: PowerReading[];
+        };
         if (Date.now() - timestamp < CACHE_TTL_MS && Array.isArray(data) && data.length > 0) {
           return data;
         }
@@ -124,7 +126,9 @@ export async function getPowerReadings(
   if (typeof window !== "undefined" && results.length > 0) {
     try {
       localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: results }));
-    } catch { /* storage quota guard */ }
+    } catch {
+      /* storage quota guard */
+    }
   }
   return results;
 }
@@ -133,10 +137,18 @@ export async function getPowerReadings(
 export function computeFieldInsights(readings: PowerReading[]): NasaFieldInsights["summary"] {
   if (!readings.length) {
     return {
-      meanTemp7d: 29.5, totalRain7d: 14, totalRain30d: 82,
-      meanHumidity7d: 74, meanSolar7d: 17.5, extremeHeatDays: 2,
-      frostRiskDays: 0, totalET7d: 32, irrigationDeficit7d: 18,
-      meanWindSpeed7d: 1.8, meanDewPoint7d: 24.1, leafWetHours7d: 8,
+      meanTemp7d: 29.5,
+      totalRain7d: 14,
+      totalRain30d: 82,
+      meanHumidity7d: 74,
+      meanSolar7d: 17.5,
+      extremeHeatDays: 2,
+      frostRiskDays: 0,
+      totalET7d: 32,
+      irrigationDeficit7d: 18,
+      meanWindSpeed7d: 1.8,
+      meanDewPoint7d: 24.1,
+      leafWetHours7d: 8,
       irrigationStatus: "Moderate",
       irrigationAdvice: "Soil moisture adequate. Monitor rainfall forecast over the next 48 hours.",
       heatStatus: "Watch",
@@ -144,41 +156,41 @@ export function computeFieldInsights(readings: PowerReading[]): NasaFieldInsight
       windStatus: "Safe",
       windAdvice: "Wind speed within safe spray application range (<3 m/s).",
       fungalRisk: "Low",
-      fungalAdvice: "Dew point and humidity conditions do not strongly favour fungal spore germination.",
+      fungalAdvice:
+        "Dew point and humidity conditions do not strongly favour fungal spore germination.",
     };
   }
 
   const last7 = readings.slice(-7);
   const nums = (arr: (number | null)[]): number[] => arr.filter((t): t is number => t !== null);
-  const avg = (a: number[]) => a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0;
+  const avg = (a: number[]) => (a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0);
   const sum = (a: number[]) => a.reduce((s, v) => s + v, 0);
 
-  const temps7   = nums(last7.map((r) => r.temperature));
+  const temps7 = nums(last7.map((r) => r.temperature));
   const tempsMax7 = nums(last7.map((r) => r.tempMax));
   const tempsMin7 = nums(last7.map((r) => r.tempMin));
-  const rains7   = nums(last7.map((r) => r.rain));
-  const rains30  = nums(readings.map((r) => r.rain));
-  const hums7    = nums(last7.map((r) => r.humidity));
-  const solars7  = nums(last7.map((r) => r.solar));
-  const winds7   = nums(last7.map((r) => r.windSpeed));
-  const dews7    = nums(last7.map((r) => r.dewPoint));
-  const et7      = nums(last7.map((r) => r.evapotranspiration));
+  const rains7 = nums(last7.map((r) => r.rain));
+  const rains30 = nums(readings.map((r) => r.rain));
+  const hums7 = nums(last7.map((r) => r.humidity));
+  const solars7 = nums(last7.map((r) => r.solar));
+  const winds7 = nums(last7.map((r) => r.windSpeed));
+  const dews7 = nums(last7.map((r) => r.dewPoint));
+  const et7 = nums(last7.map((r) => r.evapotranspiration));
 
-  const meanTemp7d       = Math.round(avg(temps7) * 10) / 10 || 30;
-  const totalRain7d      = Math.round(sum(rains7) * 10) / 10;
-  const totalRain30d     = Math.round(sum(rains30) * 10) / 10;
-  const meanHumidity7d   = Math.round(avg(hums7)) || 70;
-  const meanSolar7d      = Math.round(avg(solars7) * 10) / 10 || 16;
-  const meanWindSpeed7d  = Math.round(avg(winds7) * 10) / 10;
-  const meanDewPoint7d   = Math.round(avg(dews7) * 10) / 10;
-  const totalET7d        = Math.round(sum(et7) * 10) / 10;
+  const meanTemp7d = Math.round(avg(temps7) * 10) / 10 || 30;
+  const totalRain7d = Math.round(sum(rains7) * 10) / 10;
+  const totalRain30d = Math.round(sum(rains30) * 10) / 10;
+  const meanHumidity7d = Math.round(avg(hums7)) || 70;
+  const meanSolar7d = Math.round(avg(solars7) * 10) / 10 || 16;
+  const meanWindSpeed7d = Math.round(avg(winds7) * 10) / 10;
+  const meanDewPoint7d = Math.round(avg(dews7) * 10) / 10;
+  const totalET7d = Math.round(sum(et7) * 10) / 10;
   const irrigationDeficit7d = Math.round((totalET7d - totalRain7d) * 10) / 10;
 
-  const extremeHeatDays  = (tempsMax7.length ? tempsMax7 : temps7).filter((t) => t >= 35).length;
-  const frostRiskDays    = (tempsMin7.length ? tempsMin7 : []).filter((t) => t <= 10).length;
-  const leafWetHours7d   = last7.filter(
-    (r) => (r.humidity ?? 0) > 85 && (r.temperature ?? 30) < 28,
-  ).length * 6;
+  const extremeHeatDays = (tempsMax7.length ? tempsMax7 : temps7).filter((t) => t >= 35).length;
+  const frostRiskDays = (tempsMin7.length ? tempsMin7 : []).filter((t) => t <= 10).length;
+  const leafWetHours7d =
+    last7.filter((r) => (r.humidity ?? 0) > 85 && (r.temperature ?? 30) < 28).length * 6;
 
   // Irrigation
   let irrigationStatus: "Low" | "Moderate" | "Act Now" = "Moderate";
@@ -191,7 +203,8 @@ export function computeFieldInsights(readings: PowerReading[]): NasaFieldInsight
     irrigationAdvice = `Mild moisture deficit (~${irrigationDeficit7d}mm). Consider light irrigation if no rain forecast in next 48 hours.`;
   } else if (totalRain7d > 35) {
     irrigationStatus = "Low";
-    irrigationAdvice = "Recent rainfall sufficient. Avoid additional watering — risk of waterlogging and nitrogen leaching.";
+    irrigationAdvice =
+      "Recent rainfall sufficient. Avoid additional watering — risk of waterlogging and nitrogen leaching.";
   }
 
   // Heat
@@ -218,9 +231,10 @@ export function computeFieldInsights(readings: PowerReading[]): NasaFieldInsight
 
   // Fungal disease risk
   const humidAndCool = meanHumidity7d > 80 && meanTemp7d < 30;
-  const dewClose = meanDewPoint7d > 22 && (meanTemp7d - meanDewPoint7d) < 3;
+  const dewClose = meanDewPoint7d > 22 && meanTemp7d - meanDewPoint7d < 3;
   let fungalRisk: "Low" | "Moderate" | "High" = "Low";
-  let fungalAdvice = "Humidity and dew point do not strongly favour fungal spore germination this week.";
+  let fungalAdvice =
+    "Humidity and dew point do not strongly favour fungal spore germination this week.";
   if ((humidAndCool || dewClose) && leafWetHours7d > 12) {
     fungalRisk = "High";
     fungalAdvice = `High fungal disease risk: humidity ${meanHumidity7d}% with ~${leafWetHours7d}h estimated leaf wetness. Inspect for rice blast, sheath blight, and brown spot. Preventive fungicide may be warranted at tillering or heading stage.`;
@@ -230,13 +244,26 @@ export function computeFieldInsights(readings: PowerReading[]): NasaFieldInsight
   }
 
   return {
-    meanTemp7d, totalRain7d, totalRain30d, meanHumidity7d, meanSolar7d,
-    extremeHeatDays, frostRiskDays, totalET7d, irrigationDeficit7d,
-    meanWindSpeed7d, meanDewPoint7d, leafWetHours7d,
-    irrigationStatus, irrigationAdvice,
-    heatStatus, heatAdvice,
-    windStatus, windAdvice,
-    fungalRisk, fungalAdvice,
+    meanTemp7d,
+    totalRain7d,
+    totalRain30d,
+    meanHumidity7d,
+    meanSolar7d,
+    extremeHeatDays,
+    frostRiskDays,
+    totalET7d,
+    irrigationDeficit7d,
+    meanWindSpeed7d,
+    meanDewPoint7d,
+    leafWetHours7d,
+    irrigationStatus,
+    irrigationAdvice,
+    heatStatus,
+    heatAdvice,
+    windStatus,
+    windAdvice,
+    fungalRisk,
+    fungalAdvice,
   };
 }
 
@@ -249,7 +276,10 @@ export function formatNasaChartTimeline(readings: PowerReading[]) {
     const temp = r.temperature ?? 28;
     const humidity = r.humidity ?? 65;
     const moisture = Math.min(42, Math.max(16, Math.round(humidity * 0.25 + rain * 0.8 + 10)));
-    const vegetation = Math.min(85, Math.max(48, Math.round(62 + (rain > 1 ? 4 : -1) - (temp > 33 ? 3 : 0))));
+    const vegetation = Math.min(
+      85,
+      Math.max(48, Math.round(62 + (rain > 1 ? 4 : -1) - (temp > 33 ? 3 : 0))),
+    );
     return { day: dayLabel, rain, temp, moisture, vegetation };
   });
 }

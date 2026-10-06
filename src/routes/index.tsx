@@ -76,45 +76,67 @@ function Nav() {
   const [open, setOpen] = useState(false);
   return (
     <header className="fixed inset-x-0 top-4 z-50 px-4">
-      <nav className={`glass-panel mx-auto max-w-5xl overflow-hidden ${open ? "rounded-3xl" : "rounded-full"}`}>
+      <nav
+        className={`glass-panel mx-auto max-w-5xl overflow-hidden ${open ? "rounded-3xl" : "rounded-full"}`}
+      >
         <div className="flex items-center gap-2 py-2.5 pr-2.5 pl-3 sm:pl-6">
-        <a href="#top" className="flex shrink-0 items-center gap-2.5">
-          <span className="clay-chip flex h-10 w-10 items-center justify-center bg-leaf">
-            <Sprout className="h-5 w-5 text-primary-foreground" strokeWidth={2.2} />
-          </span>
-          <span className="font-display text-xl font-semibold tracking-tight">
-            Agro<span className="text-leaf-deep">Nova</span>
-          </span>
-        </a>
-        <div className="ml-auto hidden items-center gap-1 md:flex">
-          {navLinks.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="rounded-full px-4 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-secondary hover:text-foreground"
-            >
-              {l.label}
-            </a>
-          ))}
-        </div>
-        <Link to="/auth" className="clay-btn ml-2 hidden items-center gap-1.5 bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground md:flex">Login / Signup<ArrowRight className="h-4 w-4" /></Link>
-        <button
-          type="button"
-          onClick={() => setOpen((value) => !value)}
-          className="clay-btn bg-primary text-primary-foreground ml-auto flex h-11 w-11 items-center justify-center md:hidden"
-          aria-label={open ? "Close navigation menu" : "Open navigation menu"}
-          aria-expanded={open}
-        >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+          <a href="#top" className="flex shrink-0 items-center gap-2.5">
+            <span className="clay-chip flex h-10 w-10 items-center justify-center bg-leaf">
+              <Sprout className="h-5 w-5 text-primary-foreground" strokeWidth={2.2} />
+            </span>
+            <span className="font-display text-xl font-semibold tracking-tight">
+              Agro<span className="text-leaf-deep">Nova</span>
+            </span>
+          </a>
+          <div className="ml-auto hidden items-center gap-1 md:flex">
+            {navLinks.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                className="rounded-full px-4 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-secondary hover:text-foreground"
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+          <Link
+            to="/auth"
+            className="clay-btn ml-2 hidden items-center gap-1.5 bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground md:flex"
+          >
+            Login / Signup
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+          <button
+            type="button"
+            onClick={() => setOpen((value) => !value)}
+            className="clay-btn bg-primary text-primary-foreground ml-auto flex h-11 w-11 items-center justify-center md:hidden"
+            aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={open}
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
         {open && (
           <div className="border-t border-border px-3 py-3 md:hidden">
             <div className="flex flex-col gap-1">
               {navLinks.map((link) => (
-                <a key={link.href} href={link.href} onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 text-sm font-semibold hover:bg-secondary">{link.label}</a>
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-4 py-3 text-sm font-semibold hover:bg-secondary"
+                >
+                  {link.label}
+                </a>
               ))}
-              <Link to="/auth" onClick={() => setOpen(false)} className="clay-btn bg-primary text-primary-foreground mt-2 flex min-h-12 items-center justify-center gap-2 px-5 text-sm font-semibold">Login / Signup<ArrowRight className="h-4 w-4" /></Link>
+              <Link
+                to="/auth"
+                onClick={() => setOpen(false)}
+                className="clay-btn bg-primary text-primary-foreground mt-2 flex min-h-12 items-center justify-center gap-2 px-5 text-sm font-semibold"
+              >
+                Login / Signup
+                <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
           </div>
         )}
@@ -125,10 +147,7 @@ function Nav() {
 
 function Hero() {
   return (
-    <section
-      id="top"
-      className="relative isolate overflow-hidden pt-36 pb-20 md:pt-44 md:pb-28"
-    >
+    <section id="top" className="relative isolate overflow-hidden pt-36 pb-20 md:pt-44 md:pb-28">
       {/* Hero background: soft clay-diorama farmland under a pale sky */}
       <div className="absolute inset-0 -z-10">
         <img
@@ -153,15 +172,14 @@ function Hero() {
         />
 
         <h1 className="font-display mt-6 text-5xl leading-[1.05] font-semibold tracking-tight text-balance md:text-6xl">
-          When fields shift,{" "}
-          <span className="text-leaf-deep italic">farm with them</span> — not
+          When fields shift, <span className="text-leaf-deep italic">farm with them</span> — not
           against them.
         </h1>
 
         <p className="text-muted-foreground mx-auto mt-6 max-w-2xl text-lg leading-relaxed">
-          Seasons drift, soils dry, water moves. AgroNova watches your fields
-          from space and turns NASA Earth data into simple, spoken advice — so
-          every farmer can decide what to plant, water, and harvest next.
+          Seasons drift, soils dry, water moves. AgroNova watches your fields from space and turns
+          NASA Earth data into simple, spoken advice — so every farmer can decide what to plant,
+          water, and harvest next.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -178,7 +196,6 @@ function Hero() {
             Sign up free
           </Link>
         </div>
-
       </div>
     </section>
   );
@@ -202,10 +219,7 @@ function DataStrip() {
               NASA data inside
             </span>
             {nasaSources.map((s) => (
-              <span
-                key={s}
-                className="text-sm font-medium text-foreground/70"
-              >
+              <span key={s} className="text-sm font-medium text-foreground/70">
                 {s}
               </span>
             ))}
@@ -238,10 +252,7 @@ function HowItWorks() {
   return (
     <section id="how-it-works" className="scroll-mt-28 px-5 py-20">
       <div className="mx-auto max-w-6xl">
-        <SectionHeading
-          kicker="How it works"
-          title="Three steps between the sky and your soil"
-        />
+        <SectionHeading kicker="How it works" title="Three steps between the sky and your soil" />
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {steps.map((s, i) => (
             <div key={s.title} className="clay-card group relative p-8">
@@ -249,12 +260,8 @@ function HowItWorks() {
                 {i + 1}
               </span>
               <s.icon className="mt-4 h-9 w-9 text-leaf-deep" strokeWidth={1.6} />
-              <h3 className="font-display mt-5 text-xl font-semibold">
-                {s.title}
-              </h3>
-              <p className="text-muted-foreground mt-3 leading-relaxed">
-                {s.body}
-              </p>
+              <h3 className="font-display mt-5 text-xl font-semibold">{s.title}</h3>
+              <p className="text-muted-foreground mt-3 leading-relaxed">{s.body}</p>
             </div>
           ))}
         </div>
@@ -311,9 +318,7 @@ function NovaSection() {
             </div>
             <div className="glass-panel absolute -right-16 bottom-4 flex items-center gap-2 rounded-2xl px-4 py-3">
               <Leaf className="h-4 w-4 text-leaf-deep" />
-              <span className="text-sm font-medium">
-                12 fields watched today
-              </span>
+              <span className="text-sm font-medium">12 fields watched today</span>
             </div>
           </div>
 
@@ -328,7 +333,9 @@ function NovaSection() {
                   height={1024}
                 />
                 <div>
-                  <p className="text-sm font-semibold notranslate" translate="no">Nova</p>
+                  <p className="text-sm font-semibold notranslate" translate="no">
+                    Nova
+                  </p>
                   <p className="text-leaf-deep text-xs font-medium">
                     online · watching your fields
                   </p>
@@ -374,7 +381,8 @@ function NovaSection() {
               </span>
             </Link>
             <p className="text-muted-foreground mt-3 px-2 text-center text-xs">
-              Preview shown — click to open Nova in the full workspace with live NASA Earth observations.
+              Preview shown — click to open Nova in the full workspace with live NASA Earth
+              observations.
             </p>
           </div>
         </div>
@@ -383,13 +391,7 @@ function NovaSection() {
   );
 }
 
-function ChatBubble({
-  from,
-  text,
-}: {
-  from: "farmer" | "nova";
-  text: string;
-}) {
+function ChatBubble({ from, text }: { from: "farmer" | "nova"; text: string }) {
   const isNova = from === "nova";
   return (
     <div className={isNova ? "flex gap-2.5" : "flex justify-end"}>
@@ -461,12 +463,8 @@ function Features() {
                   {f.tag}
                 </span>
               </div>
-              <h3 className="font-display mt-6 text-xl font-semibold">
-                {f.title}
-              </h3>
-              <p className="text-muted-foreground mt-3 leading-relaxed">
-                {f.body}
-              </p>
+              <h3 className="font-display mt-6 text-xl font-semibold">{f.title}</h3>
+              <p className="text-muted-foreground mt-3 leading-relaxed">{f.body}</p>
             </div>
           ))}
         </div>
@@ -499,9 +497,7 @@ function FieldShift() {
             </div>
             <div className="glass-panel absolute -bottom-6 left-6 flex items-center gap-2 rounded-2xl px-4 py-3">
               <Satellite className="h-4 w-4 text-leaf-deep" />
-              <span className="text-sm font-medium">
-                Live boundary & health mapping
-              </span>
+              <span className="text-sm font-medium">Live boundary & health mapping</span>
             </div>
           </div>
           <div>
@@ -512,10 +508,9 @@ function FieldShift() {
               Fields are shifting. Farmers shouldn't have to guess.
             </h2>
             <p className="text-muted-foreground mt-5 text-lg leading-relaxed">
-              Rainfall patterns move. Water tables drop. Old sowing calendars
-              quietly stop matching reality. AgroNova tracks these shifts field
-              by field — and helps each farmer move with them: changing crop
-              choice, sowing dates, and water plans before losses happen.
+              Rainfall patterns move. Water tables drop. Old sowing calendars quietly stop matching
+              reality. AgroNova tracks these shifts field by field — and helps each farmer move with
+              them: changing crop choice, sowing dates, and water plans before losses happen.
             </p>
             <ul className="mt-8 space-y-4">
               {[
@@ -534,9 +529,7 @@ function FieldShift() {
             <div className="mt-10 grid grid-cols-3 gap-4">
               {mapStats.map((s) => (
                 <div key={s.label} className="clay-card-sunken px-4 py-4 text-center">
-                  <p className="font-display text-2xl font-semibold">
-                    {s.value}
-                  </p>
+                  <p className="font-display text-2xl font-semibold">{s.value}</p>
                   <p className="text-muted-foreground mt-1 text-[11px] font-semibold tracking-wide uppercase">
                     {s.label}
                   </p>
@@ -590,20 +583,16 @@ function FarmersBand() {
                 </h2>
               </div>
               <p className="text-cream/70 max-w-sm text-base leading-relaxed">
-                No logins to remember, no jargon to learn. If you can send a
-                message, you can farm with Nova.
+                No logins to remember, no jargon to learn. If you can send a message, you can farm
+                with Nova.
               </p>
             </div>
             <div className="mt-12 grid gap-5 md:grid-cols-3">
               {farmerPoints.map((p) => (
                 <div key={p.title} className="glass-dark rounded-3xl p-7">
                   <p.icon className="h-7 w-7 text-leaf" strokeWidth={1.7} />
-                  <h3 className="font-display mt-4 text-lg font-semibold text-cream">
-                    {p.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-cream/70">
-                    {p.body}
-                  </p>
+                  <h3 className="font-display mt-4 text-lg font-semibold text-cream">{p.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-cream/70">{p.body}</p>
                 </div>
               ))}
             </div>
@@ -630,8 +619,8 @@ function FinalCta() {
           Let's farm with the sky, together.
         </h2>
         <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-lg">
-          AgroNova is Team Vision-X's entry for the NASA Space Apps Challenge 2026
-          — Field Shift. We're building it with and for farming communities.
+          AgroNova is Team Vision-X's entry for the NASA Space Apps Challenge 2026 — Field Shift.
+          We're building it with and for farming communities.
         </p>
         <div className="mt-9 flex flex-wrap justify-center gap-4">
           <Link
@@ -665,31 +654,30 @@ function Footer() {
             <span className="font-display font-semibold">AgroNova</span>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 text-muted-foreground">
-            <p>Built by Team Vision-X for NASA Space Apps Challenge 2026 · Powered by open NASA Earth data</p>
+            <p>
+              Built by Team Vision-X for NASA Space Apps Challenge 2026 · Powered by open NASA Earth
+              data
+            </p>
             <div className="flex items-center gap-3">
-              <Link to="/pricing" className="text-primary hover:underline">Pricing</Link>
-              <Link to="/demo" className="hover:underline">Demo</Link>
-              <Link to="/auth" className="hover:underline">Sign Up</Link>
+              <Link to="/pricing" className="text-primary hover:underline">
+                Pricing
+              </Link>
+              <Link to="/demo" className="hover:underline">
+                Demo
+              </Link>
+              <Link to="/auth" className="hover:underline">
+                Sign Up
+              </Link>
             </div>
           </div>
-          <p className="text-muted-foreground">
-            © 2026 Team Vision-X · AgroNova
-          </p>
+          <p className="text-muted-foreground">© 2026 Team Vision-X · AgroNova</p>
         </div>
       </div>
     </footer>
   );
 }
 
-function SectionHeading({
-  kicker,
-  title,
-  sub,
-}: {
-  kicker: string;
-  title: string;
-  sub?: string;
-}) {
+function SectionHeading({ kicker, title, sub }: { kicker: string; title: string; sub?: string }) {
   return (
     <div className="mx-auto max-w-2xl text-center">
       <span className="skeu-stitch inline-block px-4 py-2 text-xs font-semibold tracking-wide uppercase text-muted-foreground">
@@ -698,11 +686,7 @@ function SectionHeading({
       <h2 className="font-display mt-5 text-4xl font-semibold tracking-tight text-balance md:text-5xl">
         {title}
       </h2>
-      {sub && (
-        <p className="text-muted-foreground mt-4 text-lg leading-relaxed">
-          {sub}
-        </p>
-      )}
+      {sub && <p className="text-muted-foreground mt-4 text-lg leading-relaxed">{sub}</p>}
     </div>
   );
 }

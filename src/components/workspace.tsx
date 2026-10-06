@@ -57,7 +57,9 @@ import {
 import { get7DayForecast, type ForecastSummary } from "@/lib/open-meteo";
 import { getFireAlerts, type FireRisk } from "@/lib/nasa-firms";
 import { applyFullPageTranslation } from "@/lib/full-translator";
-const FieldMap = lazy(() => import("@/components/field-map").then((m) => ({ default: m.FieldMap })));
+const FieldMap = lazy(() =>
+  import("@/components/field-map").then((m) => ({ default: m.FieldMap })),
+);
 import {
   Area,
   AreaChart,
@@ -87,11 +89,27 @@ import {
 } from "@/lib/agronova-demo";
 import novaMascot from "../assets/nova-mascot.png";
 
-type Tab = "profile" | "field" | "health" | "rotation" | "compare" | "simulator" | "doctor" | "forecast" | "crops" | "history" | "how";
+type Tab =
+  | "profile"
+  | "field"
+  | "health"
+  | "rotation"
+  | "compare"
+  | "simulator"
+  | "doctor"
+  | "forecast"
+  | "crops"
+  | "history"
+  | "how";
 
 type ChatMsg = { me: boolean; text: string };
 
-function useNovaChat(lang: Language, scenario: Scenario, field: DemoField, nasaData?: PowerReading[] | null) {
+function useNovaChat(
+  lang: Language,
+  scenario: Scenario,
+  field: DemoField,
+  nasaData?: PowerReading[] | null,
+) {
   const [msgs, setMsgs] = useState<ChatMsg[]>([
     {
       me: false,
@@ -123,7 +141,19 @@ function useNovaChat(lang: Language, scenario: Scenario, field: DemoField, nasaD
   return { msgs, ask };
 }
 
-const tabs: Tab[] = ["profile", "field", "health", "rotation", "compare", "simulator", "doctor", "forecast", "crops", "history", "how"];
+const tabs: Tab[] = [
+  "profile",
+  "field",
+  "health",
+  "rotation",
+  "compare",
+  "simulator",
+  "doctor",
+  "forecast",
+  "crops",
+  "history",
+  "how",
+];
 const workspaceTabs = tabs.filter((tab): tab is Exclude<Tab, "profile"> => tab !== "profile");
 const tabIcons: Record<Exclude<Tab, "profile">, typeof MapPin> = {
   field: MapPin,
@@ -176,10 +206,14 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
   const live = mode === "live";
   const navigate = useNavigate();
   const [liveFields, setLiveFields] = useState<DemoField[]>([]);
-  const [profile, setProfile] = useState<{ display_name: string; district: string; email: string } | null>(null);
+  const [profile, setProfile] = useState<{
+    display_name: string;
+    district: string;
+    email: string;
+  } | null>(null);
   const [mounted, setMounted] = useState(false);
   const [pickedCoords, setPickedCoords] = useState<[number, number] | undefined>(undefined);
-  
+
   const loadLive = async () => {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
@@ -187,7 +221,11 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
       supabase.from("profiles").select("display_name, district").eq("id", u.user.id).maybeSingle(),
       supabase.from("farmer_fields").select("*").order("created_at", { ascending: false }),
     ]);
-    setProfile({ display_name: p?.display_name ?? "", district: p?.district ?? "", email: u.user.email ?? "" });
+    setProfile({
+      display_name: p?.display_name ?? "",
+      district: p?.district ?? "",
+      email: u.user.email ?? "",
+    });
     setLiveFields(
       (rows ?? []).map((r) => ({
         id: r.id,
@@ -202,7 +240,7 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
         soil: "Clay loam",
         history: ["Saved in live workspace"],
         position: { x: 50, y: 50 },
-      }))
+      })),
     );
   };
 
@@ -246,14 +284,14 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
   const t = translations[lang] || translations.en;
-  
+
   const field = fields.find((f) => f.id === fieldId) ?? {
     ...demoFields[0]!,
     id: "",
     name: live ? "No field added yet" : "Demo Field",
     coordinates: demoFields[0]!.coordinates,
   };
-  
+
   const scenario = scenarios.find((s) => s.id === scenarioId)!;
 
   // NASA observations state for current field
@@ -323,11 +361,20 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
             aria-label={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
             title={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
           >
-            {sidebarExpanded ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
+            {sidebarExpanded ? (
+              <PanelLeftClose className="h-4 w-4" />
+            ) : (
+              <PanelLeftOpen className="h-4 w-4" />
+            )}
           </AgroButton>
         )}
         {mobile && (
-          <AgroButton size="icon" variant="ghost" onClick={() => setMobileMenuOpen(false)} aria-label="Close workspace menu">
+          <AgroButton
+            size="icon"
+            variant="ghost"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="Close workspace menu"
+          >
             <X className="h-4 w-4" />
           </AgroButton>
         )}
@@ -363,13 +410,21 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
           <UserRound className="h-4 w-4 shrink-0" />
           {(sidebarExpanded || mobile) && <span className="truncate">{t.profile}</span>}
         </AgroButton>
-        {(sidebarExpanded || mobile) ? (
-          <PlanBadge onClick={() => { setPlanOpen(true); setMobileMenuOpen(false); }} />
+        {sidebarExpanded || mobile ? (
+          <PlanBadge
+            onClick={() => {
+              setPlanOpen(true);
+              setMobileMenuOpen(false);
+            }}
+          />
         ) : (
           <AgroButton
             variant="secondary"
             size="icon"
-            onClick={() => { setPlanOpen(true); setMobileMenuOpen(false); }}
+            onClick={() => {
+              setPlanOpen(true);
+              setMobileMenuOpen(false);
+            }}
             aria-label="View subscription plan"
             title="Subscription plan"
             className="mx-auto"
@@ -385,7 +440,13 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
     <div className="bg-background min-h-screen">
       <header className="glass-panel sticky top-0 z-30 border-b border-border">
         <div className="mx-auto grid max-w-7xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 py-3 sm:px-4">
-          <AgroButton size="icon" variant="ghost" onClick={() => setMobileMenuOpen(true)} className="lg:hidden" aria-label="Open workspace menu">
+          <AgroButton
+            size="icon"
+            variant="ghost"
+            onClick={() => setMobileMenuOpen(true)}
+            className="lg:hidden"
+            aria-label="Open workspace menu"
+          >
             <Menu className="h-5 w-5" />
           </AgroButton>
           <Link to="/" className="hidden items-center gap-2 font-semibold lg:flex">
@@ -393,14 +454,18 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
             <span className="font-display text-xl">AgroNova</span>
           </Link>
           <div className="flex min-w-0 items-center gap-2">
-            <Link to="/" className="font-display truncate text-xl font-semibold lg:hidden">AgroNova</Link>
+            <Link to="/" className="font-display truncate text-xl font-semibold lg:hidden">
+              AgroNova
+            </Link>
             {live ? (
               <span className="clay-chip hidden px-3 py-1 text-xs font-semibold sm:inline">
                 {t.liveNasa}
               </span>
             ) : (
               <>
-                <span className="clay-chip hidden px-3 py-1 text-xs font-semibold sm:inline">{t.demo}</span>
+                <span className="clay-chip hidden px-3 py-1 text-xs font-semibold sm:inline">
+                  {t.demo}
+                </span>
                 <span className="text-muted-foreground hidden text-xs sm:inline">
                   {t.liveObservation}
                 </span>
@@ -413,11 +478,19 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
               {online ? t.onlineLabel : t.offlineLabel}
             </span>
             {live ? (
-              <AgroButton size="sm" variant="ghost" onClick={signOut} className="hidden sm:inline-flex">
+              <AgroButton
+                size="sm"
+                variant="ghost"
+                onClick={signOut}
+                className="hidden sm:inline-flex"
+              >
                 <LogOut className="h-4 w-4" /> {t.signOut}
               </AgroButton>
             ) : (
-              <Link to="/auth" className="clay-btn bg-primary text-primary-foreground hidden px-3 py-1.5 text-sm font-semibold sm:inline-flex">
+              <Link
+                to="/auth"
+                className="clay-btn bg-primary text-primary-foreground hidden px-3 py-1.5 text-sm font-semibold sm:inline-flex"
+              >
                 {t.loginSignup}
               </Link>
             )}
@@ -448,7 +521,10 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
                   <LogOut className="h-4 w-4" /> {t.signOut}
                 </AgroButton>
               ) : (
-                <Link to="/auth" className="clay-btn bg-primary text-primary-foreground flex min-h-12 items-center justify-center px-4 text-sm font-semibold">
+                <Link
+                  to="/auth"
+                  className="clay-btn bg-primary text-primary-foreground flex min-h-12 items-center justify-center px-4 text-sm font-semibold"
+                >
                   {t.loginSignup}
                 </Link>
               )}
@@ -457,13 +533,31 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
         </div>
       )}
 
-      <div className={`mx-auto grid max-w-[1400px] gap-6 px-4 py-6 ${sidebarExpanded ? "lg:grid-cols-[220px_minmax(0,1fr)]" : "lg:grid-cols-[76px_minmax(0,1fr)]"}`}>
-        <nav aria-label="Workspace sections" className="clay-card sticky top-24 hidden h-[calc(100vh-8rem)] flex-col p-3 lg:flex">
+      <div
+        className={`mx-auto grid max-w-[1400px] gap-6 px-4 py-6 ${sidebarExpanded ? "lg:grid-cols-[220px_minmax(0,1fr)]" : "lg:grid-cols-[76px_minmax(0,1fr)]"}`}
+      >
+        <nav
+          aria-label="Workspace sections"
+          className="clay-card sticky top-24 hidden h-[calc(100vh-8rem)] flex-col p-3 lg:flex"
+        >
           {sidebarContent()}
         </nav>
         <main className="min-w-0 space-y-6">
-          {tab === "profile" && (live ? <LiveProfile profile={profile} fieldCount={fields.length} onSaved={loadLive} lang={lang} onLanguageChange={handleLanguageChange} /> : <DemoProfile lang={lang} onLanguageChange={handleLanguageChange} />)}
-          {live && tab === "field" && <AddFieldForm onAdded={loadLive} initialCoords={pickedCoords} />}
+          {tab === "profile" &&
+            (live ? (
+              <LiveProfile
+                profile={profile}
+                fieldCount={fields.length}
+                onSaved={loadLive}
+                lang={lang}
+                onLanguageChange={handleLanguageChange}
+              />
+            ) : (
+              <DemoProfile lang={lang} onLanguageChange={handleLanguageChange} />
+            ))}
+          {live && tab === "field" && (
+            <AddFieldForm onAdded={loadLive} initialCoords={pickedCoords} />
+          )}
           {tab === "field" && (
             <FieldExplorer
               fields={fields}
@@ -476,7 +570,9 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
               lang={lang}
             />
           )}
-          {tab === "health" && <Health field={field} openEvidence={setEvidenceIds} live={live} lang={lang} />}
+          {tab === "health" && (
+            <Health field={field} openEvidence={setEvidenceIds} live={live} lang={lang} />
+          )}
           {tab === "rotation" && (
             <RotationLab
               selected={scenarioId}
@@ -509,22 +605,35 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
         </main>
       </div>
 
-      {planOpen && (
-        <PricingModal onClose={() => setPlanOpen(false)} />
-      )}
+      {planOpen && <PricingModal onClose={() => setPlanOpen(false)} />}
 
       {evidenceIds && (
-        <EvidenceDrawer ids={evidenceIds} fieldName={field.name} close={() => setEvidenceIds(null)} lang={lang} />
+        <EvidenceDrawer
+          ids={evidenceIds}
+          fieldName={field.name}
+          close={() => setEvidenceIds(null)}
+          lang={lang}
+        />
       )}
       <FloatingNova lang={lang} label={t.ask} chat={chat} />
     </div>
   );
 }
 
-function Card({ title, children, kicker }: { title: string; kicker?: string; children: React.ReactNode }) {
+function Card({
+  title,
+  children,
+  kicker,
+}: {
+  title: string;
+  kicker?: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="clay-card p-5 sm:p-6">
-      {kicker && <p className="text-primary text-xs font-semibold uppercase tracking-wider">{kicker}</p>}
+      {kicker && (
+        <p className="text-primary text-xs font-semibold uppercase tracking-wider">{kicker}</p>
+      )}
       <h2 className="font-display mb-4 text-2xl">{title}</h2>
       {children}
     </section>
@@ -564,13 +673,18 @@ function FieldExplorer({
     return (
       <Card title={live ? t.yourFarmFields : t.field}>
         <p className="text-muted-foreground">
-          {live ? "No fields registered yet. Use the 'Add a field' form above or tap the map to save your farm location." : t.noFieldMatch}
+          {live
+            ? "No fields registered yet. Use the 'Add a field' form above or tap the map to save your farm location."
+            : t.noFieldMatch}
         </p>
       </Card>
     );
   }
   return (
-    <Card kicker={t.fieldStep} title={live ? `${t.yourFarmFields} (${fields.length})` : t.chooseField}>
+    <Card
+      kicker={t.fieldStep}
+      title={live ? `${t.yourFarmFields} (${fields.length})` : t.chooseField}
+    >
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
@@ -591,9 +705,7 @@ function FieldExplorer({
           ) : (
             <div className="clay-card-sunken h-[360px]" />
           )}
-          <p className="text-muted-foreground mt-2 text-xs">
-            OpenStreetMap. {t.tapMapHint}
-          </p>
+          <p className="text-muted-foreground mt-2 text-xs">OpenStreetMap. {t.tapMapHint}</p>
         </div>
         <div className="space-y-3">
           {list.length === 0 && <p className="text-muted-foreground">{t.noFieldMatch}</p>}
@@ -757,7 +869,9 @@ function Health({
         {/* 1. Daily Irrigation Need */}
         <div className="clay-card p-5">
           <div className="flex items-center justify-between">
-            <p className="text-muted-foreground text-xs font-semibold uppercase">{t.irrigationNeed}</p>
+            <p className="text-muted-foreground text-xs font-semibold uppercase">
+              {t.irrigationNeed}
+            </p>
             <div className="flex items-center gap-1">
               <Badge>{insights.irrigationStatus}</Badge>
               <SpeechButton text={insights.irrigationAdvice} lang={lang} />
@@ -798,15 +912,21 @@ function Health({
         {/* 3. Solar & Photosynthesis */}
         <div className="clay-card p-5">
           <div className="flex items-center justify-between">
-            <p className="text-muted-foreground text-xs font-semibold uppercase">{t.solar} &amp; {t.humidity}</p>
+            <p className="text-muted-foreground text-xs font-semibold uppercase">
+              {t.solar} &amp; {t.humidity}
+            </p>
             <div className="flex items-center gap-1">
               <Badge>Active</Badge>
-              <SpeechButton text={`Solar radiation is ${insights.meanSolar7d} MegaJoules per square meter with ${insights.meanHumidity7d}% relative humidity.`} lang={lang} />
+              <SpeechButton
+                text={`Solar radiation is ${insights.meanSolar7d} MegaJoules per square meter with ${insights.meanHumidity7d}% relative humidity.`}
+                lang={lang}
+              />
             </div>
           </div>
           <p className="font-display mt-1 text-xl">{insights.meanSolar7d} MJ/m²/d</p>
           <p className="mt-2 text-xs leading-relaxed">
-            Supports active photosynthesis. 7-day mean relative humidity is {insights.meanHumidity7d}%.
+            Supports active photosynthesis. 7-day mean relative humidity is{" "}
+            {insights.meanHumidity7d}%.
           </p>
           <button
             onClick={() => openEvidence(["power", "modis"])}
@@ -862,8 +982,20 @@ function Health({
         <div className="mb-3 flex items-center justify-between">
           <div className="flex gap-2">
             {(["7", "30"] as const).map((r) => (
-              <AgroButton key={r} size="sm" variant={range === r ? "primary" : "ghost"} onClick={() => setRange(r)}>
-                {r} {lang === "bn" || lang === "hi" ? "দিন" : lang === "es" ? "días" : lang === "sw" ? "siku" : "days"}
+              <AgroButton
+                key={r}
+                size="sm"
+                variant={range === r ? "primary" : "ghost"}
+                onClick={() => setRange(r)}
+              >
+                {r}{" "}
+                {lang === "bn" || lang === "hi"
+                  ? "দিন"
+                  : lang === "es"
+                    ? "días"
+                    : lang === "sw"
+                      ? "siku"
+                      : "days"}
               </AgroButton>
             ))}
           </div>
@@ -878,9 +1010,24 @@ function Health({
               <XAxis dataKey="day" fontSize={12} />
               <YAxis fontSize={12} />
               <Tooltip />
-              <Line dataKey="temp" name={`${t.temperature} (°C)`} stroke="var(--primary)" strokeWidth={2.5} />
-              <Line dataKey="moisture" name="Soil Moisture Index (%)" stroke="var(--accent)" strokeWidth={2.5} />
-              <Line dataKey="vegetation" name="Vegetation Vitality" stroke="var(--muted-foreground)" strokeWidth={2} />
+              <Line
+                dataKey="temp"
+                name={`${t.temperature} (°C)`}
+                stroke="var(--primary)"
+                strokeWidth={2.5}
+              />
+              <Line
+                dataKey="moisture"
+                name="Soil Moisture Index (%)"
+                stroke="var(--accent)"
+                strokeWidth={2.5}
+              />
+              <Line
+                dataKey="vegetation"
+                name="Vegetation Vitality"
+                stroke="var(--muted-foreground)"
+                strokeWidth={2}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -891,7 +1038,12 @@ function Health({
               <XAxis dataKey="day" fontSize={12} />
               <YAxis fontSize={12} />
               <Tooltip />
-              <Area dataKey="rain" name={`${t.rainfall} (mm)`} stroke="var(--primary)" fill="var(--secondary)" />
+              <Area
+                dataKey="rain"
+                name={`${t.rainfall} (mm)`}
+                stroke="var(--primary)"
+                fill="var(--secondary)"
+              />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -951,10 +1103,10 @@ Be encouraging, specific, and grounded for a smallholder farmer.`;
     } else {
       setAdvisoryText(
         `💡 Agronomic Action Plan: ${selectedScenario.name}\n\n` +
-        `1. 🌾 Sowing & Transition: Plant ${selectedScenario.sequence[1] || "legumes"} immediately following ${selectedScenario.sequence[0] || "rice"} harvest to utilize residual soil moisture. This allows you to capture end-of-season moisture before the dry period sets in.\n` +
-        `2. 💧 Water Management: Current 7-day rainfall is ${recentRain.toFixed(1)}mm. Implement alternate wetting and drying (AWD) irrigation to realize the projected ${selectedScenario.water}/100 water score — this can save 20–30% of irrigation water compared to continuous flooding.\n` +
-        `3. 🛡️ Soil & Pest Defense: Incorporating legumes into this rotation fixes atmospheric nitrogen (targeting ${selectedScenario.soil}/100 soil index) and breaks the monoculture pest cycle. This reduces fertilizer costs and lowers blast and sheath blight pressure in subsequent rice seasons.\n\n` +
-        `Source: AgroNova Agronomy Engine · NASA POWER observations · Verified against BRRI and IRRI crop calendars for South Asia.`
+          `1. 🌾 Sowing & Transition: Plant ${selectedScenario.sequence[1] || "legumes"} immediately following ${selectedScenario.sequence[0] || "rice"} harvest to utilize residual soil moisture. This allows you to capture end-of-season moisture before the dry period sets in.\n` +
+          `2. 💧 Water Management: Current 7-day rainfall is ${recentRain.toFixed(1)}mm. Implement alternate wetting and drying (AWD) irrigation to realize the projected ${selectedScenario.water}/100 water score — this can save 20–30% of irrigation water compared to continuous flooding.\n` +
+          `3. 🛡️ Soil & Pest Defense: Incorporating legumes into this rotation fixes atmospheric nitrogen (targeting ${selectedScenario.soil}/100 soil index) and breaks the monoculture pest cycle. This reduces fertilizer costs and lowers blast and sheath blight pressure in subsequent rice seasons.\n\n` +
+          `Source: AgroNova Agronomy Engine · NASA POWER observations · Verified against BRRI and IRRI crop calendars for South Asia.`,
       );
     }
     setAdvisoryLoading(false);
@@ -993,7 +1145,8 @@ Be encouraging, specific, and grounded for a smallholder farmer.`;
         </div>
 
         <p className="text-xs text-muted-foreground mb-3">
-          Generates field-tailored recommendations combining your soil profile, selected sequence ({selectedScenario.sequence.join(" → ")}), and NASA satellite observations.
+          Generates field-tailored recommendations combining your soil profile, selected sequence (
+          {selectedScenario.sequence.join(" → ")}), and NASA satellite observations.
         </p>
 
         {advisoryText && (
@@ -1025,13 +1178,19 @@ Be encouraging, specific, and grounded for a smallholder farmer.`;
               <span className="font-display text-2xl">
                 {s.id}. {s.name}
               </span>
-              <span className="clay-chip ml-auto px-3 py-1 font-semibold">{t.overallFit} {s.score}/100</span>
+              <span className="clay-chip ml-auto px-3 py-1 font-semibold">
+                {t.overallFit} {s.score}/100
+              </span>
             </div>
             <div className="my-3 flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold text-muted-foreground mr-1">{t.rotationSeq}:</span>
+              <span className="text-xs font-semibold text-muted-foreground mr-1">
+                {t.rotationSeq}:
+              </span>
               {s.sequence.map((c, i) => (
                 <span key={c} className="flex items-center gap-2">
-                  <span className="bg-secondary rounded-full px-3 py-1 text-sm font-semibold">{c}</span>
+                  <span className="bg-secondary rounded-full px-3 py-1 text-sm font-semibold">
+                    {c}
+                  </span>
                   {i < s.sequence.length - 1 && "→"}
                 </span>
               ))}
@@ -1058,7 +1217,9 @@ Be encouraging, specific, and grounded for a smallholder farmer.`;
                 </p>
               </div>
             </div>
-            <p className="text-muted-foreground mt-2 text-sm">{t.waterFit}: {s.water}/100 · Trade-off: {s.tradeoff}</p>
+            <p className="text-muted-foreground mt-2 text-sm">
+              {t.waterFit}: {s.water}/100 · Trade-off: {s.tradeoff}
+            </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <AgroButton size="sm" onClick={() => setSelected(s.id)}>
                 {selected === s.id ? "✓ " + t.select : t.select}
@@ -1066,14 +1227,22 @@ Be encouraging, specific, and grounded for a smallholder farmer.`;
               <AgroButton size="sm" variant="ghost" onClick={() => openEvidence(s.evidenceIds)}>
                 <Satellite className="h-4 w-4" /> {t.source}
               </AgroButton>
-              <AgroButton size="sm" variant="secondary" onClick={() => { setSelected(s.id); save(); }}>
+              <AgroButton
+                size="sm"
+                variant="secondary"
+                onClick={() => {
+                  setSelected(s.id);
+                  save();
+                }}
+              >
                 {t.save}
               </AgroButton>
             </div>
           </div>
         ))}
         <p className="text-muted-foreground text-xs">
-          Adaptive rotation options based on NASA Earth observations. Consult local agricultural extension for field testing.
+          Adaptive rotation options based on NASA Earth observations. Consult local agricultural
+          extension for field testing.
         </p>
       </div>
 
@@ -1082,7 +1251,10 @@ Be encouraging, specific, and grounded for a smallholder farmer.`;
           <SummaryCard
             field={field || demoFields[0]!}
             scenario={selectedScenario}
-            save={() => { setSelected(selectedScenario.id); save(); }}
+            save={() => {
+              setSelected(selectedScenario.id);
+              save();
+            }}
             lang={lang}
           />
         </div>
@@ -1090,7 +1262,6 @@ Be encouraging, specific, and grounded for a smallholder farmer.`;
     </Card>
   );
 }
-
 
 const metrics = ["water", "rainfall", "temperature", "soil", "resilience", "priority"] as const;
 
@@ -1103,16 +1274,26 @@ function Compare({ lang = "en" }: { lang?: Language }) {
           <thead>
             <tr className="text-left">
               <th className="p-2">{t.evidence}</th>
-              {scenarios.map((s) => <th key={s.id} className="p-2">{s.id}. {s.name}</th>)}
+              {scenarios.map((s) => (
+                <th key={s.id} className="p-2">
+                  {s.id}. {s.name}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {metrics.map((m) => (
               <tr key={m} className="border-t border-border">
-                <td className="p-2 capitalize">{({
-                  water: t.water, rainfall: t.rainfall, temperature: t.temperature,
-                  soil: t.soilType, resilience: "Resilience", priority: t.priority,
-                })[m] ?? m}</td>
+                <td className="p-2 capitalize">
+                  {{
+                    water: t.water,
+                    rainfall: t.rainfall,
+                    temperature: t.temperature,
+                    soil: t.soilType,
+                    resilience: "Resilience",
+                    priority: t.priority,
+                  }[m] ?? m}
+                </td>
                 {scenarios.map((s) => (
                   <td key={s.id} className="p-2">
                     <div className="flex items-center gap-2">
@@ -1147,8 +1328,17 @@ function Simulator({ lang }: { lang: Language }) {
   const [soilOM, setSoilOM] = useState(1.6);
   const [showSoil, setShowSoil] = useState(false);
 
-  const soil: SoilProfile = { nitrogen: soilN, phosphorus: soilP, potassium: soilK, ph: soilPh, organicMatter: soilOM };
-  const limitingFactor = useMemo(() => computeSoilLimitingFactor(soil), [soilN, soilP, soilK, soilPh, soilOM]);
+  const soil: SoilProfile = {
+    nitrogen: soilN,
+    phosphorus: soilP,
+    potassium: soilK,
+    ph: soilPh,
+    organicMatter: soilOM,
+  };
+  const limitingFactor = useMemo(
+    () => computeSoilLimitingFactor(soil),
+    [soilN, soilP, soilK, soilPh, soilOM],
+  );
 
   const results = useMemo(
     () => scenarios.map((s) => adjustedScenario(s, rain, water, temp, season)),
@@ -1159,7 +1349,15 @@ function Simulator({ lang }: { lang: Language }) {
     [t.rainfallChange, rain, setRain, -40, 40, 5, "%"],
     [t.waterAvail, water, setWater, -40, 40, 5, "%"],
     [t.tempChange, temp, setTemp, -2, 4, 0.5, "°C"],
-    [t.seasonLength, season, setSeason, -21, 21, 7, ` ${lang === "bn" || lang === "hi" ? "দিন" : lang === "es" ? "días" : lang === "sw" ? "siku" : "days"}`],
+    [
+      t.seasonLength,
+      season,
+      setSeason,
+      -21,
+      21,
+      7,
+      ` ${lang === "bn" || lang === "hi" ? "দিন" : lang === "es" ? "días" : lang === "sw" ? "siku" : "days"}`,
+    ],
   ];
 
   const severityBg = {
@@ -1183,10 +1381,19 @@ function Simulator({ lang }: { lang: Language }) {
         {climateSliders.map(([label, v, set, min, max, step, unit]) => (
           <label key={label} className="clay-card-sunken block p-4">
             <span className="flex justify-between text-sm font-semibold">
-              {label} <span>{v > 0 ? "+" : ""}{v}{unit}</span>
+              {label}{" "}
+              <span>
+                {v > 0 ? "+" : ""}
+                {v}
+                {unit}
+              </span>
             </span>
             <input
-              type="range" min={min} max={max} step={step} value={v}
+              type="range"
+              min={min}
+              max={max}
+              step={step}
+              value={v}
               onChange={(e) => set(Number(e.target.value))}
               className="mt-3 w-full accent-[var(--primary)]"
             />
@@ -1203,7 +1410,9 @@ function Simulator({ lang }: { lang: Language }) {
         <span className="flex items-center gap-2">
           🌱 {t.soilNutrient}
           {limitingFactor.factor !== "Balanced" && (
-            <span className={`rounded-full border px-2 py-0.5 text-xs ${severityBg[limitingFactor.severity]}`}>
+            <span
+              className={`rounded-full border px-2 py-0.5 text-xs ${severityBg[limitingFactor.severity]}`}
+            >
               ⚠ {limitingFactor.factor} {t.limitingFactor}
             </span>
           )}
@@ -1213,36 +1422,47 @@ function Simulator({ lang }: { lang: Language }) {
 
       {showSoil && (
         <div className="mt-3 space-y-4">
-          <p className="text-xs text-muted-foreground">
-            {t.liebigHint}
-          </p>
+          <p className="text-xs text-muted-foreground">{t.liebigHint}</p>
 
           {/* Soil sliders */}
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {([
-              ["Nitrogen (N)", soilN, setSoilN, 10, 150, 5, " kg/ha", "80–120"],
-              ["Phosphorus (P)", soilP, setSoilP, 5, 80, 2, " kg/ha", "20–40"],
-              ["Potassium (K)", soilK, setSoilK, 10, 120, 5, " kg/ha", "40–80"],
-              ["Soil pH", soilPh, setSoilPh, 4.0, 9.0, 0.1, "", "6.0–7.0"],
-              ["Organic Matter", soilOM, setSoilOM, 0.2, 6.0, 0.1, "%", ">2%"],
-            ] as const).map(([label, v, set, min, max, step, unit, ideal]) => (
+            {(
+              [
+                ["Nitrogen (N)", soilN, setSoilN, 10, 150, 5, " kg/ha", "80–120"],
+                ["Phosphorus (P)", soilP, setSoilP, 5, 80, 2, " kg/ha", "20–40"],
+                ["Potassium (K)", soilK, setSoilK, 10, 120, 5, " kg/ha", "40–80"],
+                ["Soil pH", soilPh, setSoilPh, 4.0, 9.0, 0.1, "", "6.0–7.0"],
+                ["Organic Matter", soilOM, setSoilOM, 0.2, 6.0, 0.1, "%", ">2%"],
+              ] as const
+            ).map(([label, v, set, min, max, step, unit, ideal]) => (
               <label key={label} className="clay-card-sunken block p-3">
                 <span className="flex justify-between text-xs font-semibold">
                   {label}
-                  <span className="font-mono">{v}{unit}</span>
+                  <span className="font-mono">
+                    {v}
+                    {unit}
+                  </span>
                 </span>
                 <input
-                  type="range" min={min} max={max} step={step} value={v}
+                  type="range"
+                  min={min}
+                  max={max}
+                  step={step}
+                  value={v}
                   onChange={(e) => set(Number(e.target.value))}
                   className="mt-2 w-full accent-[var(--primary)]"
                 />
-                <span className="text-[10px] text-muted-foreground">{t.idealRange}: {ideal}</span>
+                <span className="text-[10px] text-muted-foreground">
+                  {t.idealRange}: {ideal}
+                </span>
               </label>
             ))}
           </div>
 
           {/* Limiting factor result */}
-          <div className={`clay-card rounded-2xl border p-4 ${severityBg[limitingFactor.severity]}`}>
+          <div
+            className={`clay-card rounded-2xl border p-4 ${severityBg[limitingFactor.severity]}`}
+          >
             <div className="flex items-center gap-3">
               <span className="text-3xl">{limitingFactor.icon}</span>
               <div className="flex-1">
@@ -1252,7 +1472,9 @@ function Simulator({ lang }: { lang: Language }) {
                       ? t.soilBalanced
                       : `#1 ${t.limitingFactor}: ${limitingFactor.factor}`}
                   </p>
-                  <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${severityBg[limitingFactor.severity]}`}>
+                  <span
+                    className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${severityBg[limitingFactor.severity]}`}
+                  >
                     {limitingFactor.severity}
                   </span>
                 </div>
@@ -1273,14 +1495,19 @@ function Simulator({ lang }: { lang: Language }) {
         {results.map((r) => (
           <div key={r.id} className="clay-card p-4">
             <div className="flex items-center justify-between">
-              <p className="font-semibold">{r.id}. {r.name}</p>
+              <p className="font-semibold">
+                {r.id}. {r.name}
+              </p>
               <SpeechButton text={r.explanation} lang={lang} />
             </div>
             <p className="font-display text-3xl">
               {r.score} → {r.adjustedScore}
             </p>
-            <p className={`text-sm font-semibold ${r.delta < 0 ? "text-destructive" : "text-primary"}`}>
-              {r.delta > 0 ? "+" : ""}{r.delta} points
+            <p
+              className={`text-sm font-semibold ${r.delta < 0 ? "text-destructive" : "text-primary"}`}
+            >
+              {r.delta > 0 ? "+" : ""}
+              {r.delta} points
             </p>
             {showSoil && limitingFactor.yieldImpact > 0 && (
               <p className="text-muted-foreground mt-1 text-xs">
@@ -1295,10 +1522,17 @@ function Simulator({ lang }: { lang: Language }) {
   );
 }
 
-
 function ForecastPanel({
-  lat, lon, fieldName, lang,
-}: { lat: number; lon: number; fieldName: string; lang: Language }) {
+  lat,
+  lon,
+  fieldName,
+  lang,
+}: {
+  lat: number;
+  lon: number;
+  fieldName: string;
+  lang: Language;
+}) {
   const t = translations[lang] || translations.en;
   const [forecast, setForecast] = useState<ForecastSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1359,7 +1593,9 @@ function ForecastPanel({
             key={day.date}
             className={`clay-card-sunken rounded-2xl border p-3 text-center ${day.riskLevel !== "Low" ? riskColor[day.riskLevel] : ""}`}
           >
-            <p className="text-[11px] font-semibold uppercase tracking-wide opacity-70">{day.label}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wide opacity-70">
+              {day.label}
+            </p>
             <p className="my-1 text-3xl">{day.weatherEmoji}</p>
             <p className="text-xs font-medium">{day.weatherLabel}</p>
             <div className="mt-2 flex justify-around text-xs">
@@ -1367,14 +1603,27 @@ function ForecastPanel({
               <span className="text-muted-foreground">{day.tempMin}°</span>
             </div>
             <div className="mt-1.5 space-y-0.5 text-[10px] text-muted-foreground">
-              <p>🌧 {day.rain} mm {lang === "bn" || lang === "hi" ? "বৃষ্টি" : "rain"}</p>
+              <p>
+                🌧 {day.rain} mm {lang === "bn" || lang === "hi" ? "বৃষ্টি" : "rain"}
+              </p>
               <p>💧 ET₀ {day.et0} mm</p>
               {day.irrigationNeed > 0 && (
-                <p className="font-semibold text-primary">+{day.irrigationNeed}mm {lang === "bn" || lang === "hi" ? "প্রয়োজন" : lang === "es" ? "necesario" : lang === "sw" ? "inahitajika" : "needed"}</p>
+                <p className="font-semibold text-primary">
+                  +{day.irrigationNeed}mm{" "}
+                  {lang === "bn" || lang === "hi"
+                    ? "প্রয়োজন"
+                    : lang === "es"
+                      ? "necesario"
+                      : lang === "sw"
+                        ? "inahitajika"
+                        : "needed"}
+                </p>
               )}
             </div>
             {day.riskLevel !== "Low" && (
-              <div className={`mt-2 rounded-xl border px-2 py-1 text-[10px] font-semibold ${riskColor[day.riskLevel]}`}>
+              <div
+                className={`mt-2 rounded-xl border px-2 py-1 text-[10px] font-semibold ${riskColor[day.riskLevel]}`}
+              >
                 {day.riskLevel === "Alert" ? "⚠️ Alert" : "👁 Watch"}
               </div>
             )}
@@ -1385,11 +1634,16 @@ function ForecastPanel({
       {/* Risk advice summary */}
       {forecast.days.filter((d) => d.riskLevel !== "Low").length > 0 && (
         <div className="mt-4 space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t.forecastAlerts}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {t.forecastAlerts}
+          </p>
           {forecast.days
             .filter((d) => d.riskLevel !== "Low")
             .map((d) => (
-              <div key={d.date} className={`rounded-xl border p-3 text-sm ${riskColor[d.riskLevel]}`}>
+              <div
+                key={d.date}
+                className={`rounded-xl border p-3 text-sm ${riskColor[d.riskLevel]}`}
+              >
                 <span className="font-semibold">{d.label}:</span> {d.riskReason}
               </div>
             ))}
@@ -1416,14 +1670,11 @@ function ForecastPanel({
             );
           })}
         </div>
-        <p className="mt-2 text-xs text-muted-foreground">
-          {t.irrigBarSub}
-        </p>
+        <p className="mt-2 text-xs text-muted-foreground">{t.irrigBarSub}</p>
       </div>
     </Card>
   );
 }
-
 
 function CropLibrary({ lang, field }: { lang: Language; field: DemoField }) {
   const t = translations[lang] || translations.en;
@@ -1450,13 +1701,22 @@ function CropLibrary({ lang, field }: { lang: Language; field: DemoField }) {
                     {lang === "bn" ? `${c.bn} (${c.name})` : c.name}
                   </p>
                   {isCurrentSeasonMatch && (
-                    <span className="clay-chip text-[11px] font-semibold text-primary">In Window</span>
+                    <span className="clay-chip text-[11px] font-semibold text-primary">
+                      In Window
+                    </span>
                   )}
                 </div>
-                <SpeechButton text={`${c.name}. Season: ${c.season}. Duration: ${c.duration}. Water requirement: ${c.water}. Optimal temperature: ${c.temp}. Recommended soil: ${c.soil}.`} lang={lang} />
+                <SpeechButton
+                  text={`${c.name}. Season: ${c.season}. Duration: ${c.duration}. Water requirement: ${c.water}. Optimal temperature: ${c.temp}. Recommended soil: ${c.soil}.`}
+                  lang={lang}
+                />
               </div>
-              <p className="mt-1 font-medium">{c.season} · {c.duration}</p>
-              <p className="text-muted-foreground mt-0.5">Water: {c.water} · Optimal Temp: {c.temp}</p>
+              <p className="mt-1 font-medium">
+                {c.season} · {c.duration}
+              </p>
+              <p className="text-muted-foreground mt-0.5">
+                Water: {c.water} · Optimal Temp: {c.temp}
+              </p>
               <p className="text-muted-foreground">Soil: {c.soil}</p>
               <p className="text-muted-foreground mt-1 text-xs">Follows well: {c.follows}</p>
             </div>
@@ -1467,13 +1727,23 @@ function CropLibrary({ lang, field }: { lang: Language; field: DemoField }) {
   );
 }
 
-function History({ field, saved, lang = "en" }: { field: DemoField; saved: string[]; lang?: Language }) {
+function History({
+  field,
+  saved,
+  lang = "en",
+}: {
+  field: DemoField;
+  saved: string[];
+  lang?: Language;
+}) {
   const t = translations[lang] || translations.en;
   return (
     <Card title={`${t.historyTitle} — ${field.name}`}>
       <div className="space-y-4">
         <div>
-          <p className="text-muted-foreground mb-2 text-xs font-semibold uppercase tracking-wider">Previous crops and notes</p>
+          <p className="text-muted-foreground mb-2 text-xs font-semibold uppercase tracking-wider">
+            Previous crops and notes
+          </p>
           <ul className="clay-card-sunken space-y-2 p-4 text-sm">
             {field.history.map((h, i) => (
               <li key={i} className="flex items-center gap-2">
@@ -1484,7 +1754,9 @@ function History({ field, saved, lang = "en" }: { field: DemoField; saved: strin
           </ul>
         </div>
         <div>
-          <p className="text-muted-foreground mb-2 text-xs font-semibold uppercase tracking-wider">{t.savedPlans} ({saved.length})</p>
+          <p className="text-muted-foreground mb-2 text-xs font-semibold uppercase tracking-wider">
+            {t.savedPlans} ({saved.length})
+          </p>
           {saved.length === 0 ? (
             <p className="text-muted-foreground text-sm">{t.noSavedPlans}</p>
           ) : (
@@ -1508,32 +1780,63 @@ function HowItWorks({ lang = "en" }: { lang?: Language }) {
   return (
     <Card title={t.howTitle}>
       <div className="space-y-4 text-sm leading-relaxed">
-        <p>AgroNova translates open satellite data into plain, actionable advice for smallholder farmers adapting to changing seasons.</p>
+        <p>
+          AgroNova translates open satellite data into plain, actionable advice for smallholder
+          farmers adapting to changing seasons.
+        </p>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="clay-card-sunken p-4">
             <p className="font-semibold">Live NASA Data (this demo)</p>
-            <p className="text-muted-foreground mt-1">NASA POWER agroclimatology API delivers real 30-day observations of temperature, rainfall, humidity, solar radiation, wind speed, and evapotranspiration for your field's exact coordinates — updated within 3–4 days of satellite pass.</p>
+            <p className="text-muted-foreground mt-1">
+              NASA POWER agroclimatology API delivers real 30-day observations of temperature,
+              rainfall, humidity, solar radiation, wind speed, and evapotranspiration for your
+              field's exact coordinates — updated within 3–4 days of satellite pass.
+            </p>
           </div>
           <div className="clay-card-sunken p-4">
             <p className="font-semibold">Open-Meteo Forecast (live)</p>
-            <p className="text-muted-foreground mt-1">7-day weather forecast powered by ECMWF IFS, including FAO-56 Penman-Monteith ET₀ calculations for daily irrigation need estimates. Free and no API key required.</p>
+            <p className="text-muted-foreground mt-1">
+              7-day weather forecast powered by ECMWF IFS, including FAO-56 Penman-Monteith ET₀
+              calculations for daily irrigation need estimates. Free and no API key required.
+            </p>
           </div>
           <div className="clay-card-sunken p-4">
             <p className="font-semibold">Representative Demo Data</p>
-            <p className="text-muted-foreground mt-1">SMAP soil moisture, MODIS vegetation vitality, and Landsat boundary change detection are shown as representative sample values dated August–September 2025. Full integration is planned for the production release.</p>
+            <p className="text-muted-foreground mt-1">
+              SMAP soil moisture, MODIS vegetation vitality, and Landsat boundary change detection
+              are shown as representative sample values dated August–September 2025. Full
+              integration is planned for the production release.
+            </p>
           </div>
           <div className="clay-card-sunken p-4">
             <p className="font-semibold">Deterministic Decision Engine</p>
-            <p className="text-muted-foreground mt-1">Crop rotation scenarios are scored using agronomic water, temperature, and soil fitness curves from BRRI and IRRI crop calendars. Every recommendation links to its underlying NASA dataset.</p>
+            <p className="text-muted-foreground mt-1">
+              Crop rotation scenarios are scored using agronomic water, temperature, and soil
+              fitness curves from BRRI and IRRI crop calendars. Every recommendation links to its
+              underlying NASA dataset.
+            </p>
           </div>
         </div>
-        <p className="text-muted-foreground text-xs">Transparency guarantee: Every recommendation links directly to its underlying NASA dataset, observation date, spatial resolution, and processing limitations.</p>
+        <p className="text-muted-foreground text-xs">
+          Transparency guarantee: Every recommendation links directly to its underlying NASA
+          dataset, observation date, spatial resolution, and processing limitations.
+        </p>
       </div>
     </Card>
   );
 }
 
-function SummaryCard({ field, scenario, save, lang = "en" }: { field: DemoField; scenario: Scenario; save: () => void; lang?: Language }) {
+function SummaryCard({
+  field,
+  scenario,
+  save,
+  lang = "en",
+}: {
+  field: DemoField;
+  scenario: Scenario;
+  save: () => void;
+  lang?: Language;
+}) {
   const t = translations[lang] || translations.en;
   const share = async () => {
     const text = `AgroNova plan: ${field.name} (${field.district}) — ${scenario.name} (${scenario.sequence.join(" → ")})`;
@@ -1543,23 +1846,51 @@ function SummaryCard({ field, scenario, save, lang = "en" }: { field: DemoField;
   return (
     <div className="glass-dark rounded-3xl p-5 print:bg-white print:text-black print:shadow-none">
       <p className="text-xs uppercase tracking-wider opacity-80">AgroNova Farm Advisory Plan</p>
-      <p className="font-display text-xl">{field.name} · {field.district}</p>
-      <p className="mt-1 flex items-center gap-2 text-sm"><Sprout className="h-4 w-4" />{scenario.sequence.join(" → ")}</p>
-      <p className="mt-1 flex items-center gap-2 text-sm"><Droplets className="h-4 w-4" />{t.waterFit}: {scenario.water}/100 · {t.overallFit}: {scenario.score}/100</p>
+      <p className="font-display text-xl">
+        {field.name} · {field.district}
+      </p>
+      <p className="mt-1 flex items-center gap-2 text-sm">
+        <Sprout className="h-4 w-4" />
+        {scenario.sequence.join(" → ")}
+      </p>
+      <p className="mt-1 flex items-center gap-2 text-sm">
+        <Droplets className="h-4 w-4" />
+        {t.waterFit}: {scenario.water}/100 · {t.overallFit}: {scenario.score}/100
+      </p>
       <div className="mt-3 border-t border-white/20 pt-2 text-xs">
-        <p><b>{t.action}:</b> {scenario.action}</p>
-        <p className="mt-1"><b>{t.rationale}:</b> {scenario.why}</p>
+        <p>
+          <b>{t.action}:</b> {scenario.action}
+        </p>
+        <p className="mt-1">
+          <b>{t.rationale}:</b> {scenario.why}
+        </p>
       </div>
       <div className="mt-4 flex flex-wrap gap-2 print:hidden">
-        <AgroButton size="sm" variant="secondary" onClick={save}>{t.save}</AgroButton>
-        <AgroButton size="sm" variant="secondary" onClick={() => window.print()}><FileDown className="h-4 w-4" />{t.download}</AgroButton>
-        <AgroButton size="sm" variant="secondary" onClick={share}><Share2 className="h-4 w-4" />{t.share}</AgroButton>
+        <AgroButton size="sm" variant="secondary" onClick={save}>
+          {t.save}
+        </AgroButton>
+        <AgroButton size="sm" variant="secondary" onClick={() => window.print()}>
+          <FileDown className="h-4 w-4" />
+          {t.download}
+        </AgroButton>
+        <AgroButton size="sm" variant="secondary" onClick={share}>
+          <Share2 className="h-4 w-4" />
+          {t.share}
+        </AgroButton>
       </div>
     </div>
   );
 }
 
-function Nova({ lang, label, chat }: { lang: Language; label: string; chat: ReturnType<typeof useNovaChat> }) {
+function Nova({
+  lang,
+  label,
+  chat,
+}: {
+  lang: Language;
+  label: string;
+  chat: ReturnType<typeof useNovaChat>;
+}) {
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
   const { msgs, ask } = chat;
@@ -1577,9 +1908,27 @@ function Nova({ lang, label, chat }: { lang: Language; label: string; chat: Retu
 
   const toggleVoiceInput = () => {
     if (typeof window === "undefined") return;
+    type SpeechRecognitionConstructor = new () => {
+      lang: string;
+      interimResults: boolean;
+      onstart: () => void;
+      onend: () => void;
+      onerror: () => void;
+      onresult: (event: { results: Array<Array<{ transcript: string }>> }) => void;
+      start: () => void;
+    };
     const SpeechRecognition =
-      (window as unknown as { SpeechRecognition?: any; webkitSpeechRecognition?: any }).SpeechRecognition ||
-      (window as unknown as { webkitSpeechRecognition?: any }).webkitSpeechRecognition;
+      (
+        window as unknown as {
+          SpeechRecognition?: SpeechRecognitionConstructor;
+          webkitSpeechRecognition?: SpeechRecognitionConstructor;
+        }
+      ).SpeechRecognition ||
+      (
+        window as unknown as {
+          webkitSpeechRecognition?: SpeechRecognitionConstructor;
+        }
+      ).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
       alert("Voice input is supported in Chrome or Edge.");
@@ -1601,7 +1950,7 @@ function Nova({ lang, label, chat }: { lang: Language; label: string; chat: Retu
       recognition.onstart = () => setIsListening(true);
       recognition.onend = () => setIsListening(false);
       recognition.onerror = () => setIsListening(false);
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event) => {
         const transcript = event.results[0]?.[0]?.transcript;
         if (transcript) {
           send(transcript);
@@ -1627,7 +1976,9 @@ function Nova({ lang, label, chat }: { lang: Language; label: string; chat: Retu
             <p className="font-display text-lg font-bold tracking-wide notranslate" translate="no">
               Nova
             </p>
-            <p className="text-[11px] text-muted-foreground">Agronomy &amp; NASA Earth Observation</p>
+            <p className="text-[11px] text-muted-foreground">
+              Agronomy &amp; NASA Earth Observation
+            </p>
           </div>
         </div>
         <span className="rounded-full bg-primary/10 border border-primary/20 px-2 py-0.5 text-[10px] font-semibold text-primary">
@@ -1636,8 +1987,13 @@ function Nova({ lang, label, chat }: { lang: Language; label: string; chat: Retu
       </div>
       <div className="max-h-80 space-y-2 overflow-y-auto pr-1">
         {msgs.map((m, i) => (
-          <div key={i} className={`flex items-start gap-1.5 ${m.me ? "justify-end" : "justify-start"}`}>
-            <p className={`rounded-2xl px-3 py-2 text-sm ${m.me ? "bg-primary text-primary-foreground ml-6" : "bg-secondary mr-2 flex-1"}`}>
+          <div
+            key={i}
+            className={`flex items-start gap-1.5 ${m.me ? "justify-end" : "justify-start"}`}
+          >
+            <p
+              className={`rounded-2xl px-3 py-2 text-sm ${m.me ? "bg-primary text-primary-foreground ml-6" : "bg-secondary mr-2 flex-1"}`}
+            >
               {m.text}
             </p>
             {!m.me && <SpeechButton text={m.text} lang={lang} />}
@@ -1676,13 +2032,33 @@ function Nova({ lang, label, chat }: { lang: Language; label: string; chat: Retu
   );
 }
 
-function FloatingNova({ lang, label, chat }: { lang: Language; label: string; chat: ReturnType<typeof useNovaChat> }) {
+function FloatingNova({
+  lang,
+  label,
+  chat,
+}: {
+  lang: Language;
+  label: string;
+  chat: ReturnType<typeof useNovaChat>;
+}) {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ x: 24, y: 24 });
-  const drag = useRef<{ startX: number; startY: number; baseX: number; baseY: number; moved: boolean } | null>(null);
+  const drag = useRef<{
+    startX: number;
+    startY: number;
+    baseX: number;
+    baseY: number;
+    moved: boolean;
+  } | null>(null);
 
   const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
-    drag.current = { startX: e.clientX, startY: e.clientY, baseX: pos.x, baseY: pos.y, moved: false };
+    drag.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      baseX: pos.x,
+      baseY: pos.y,
+      moved: false,
+    };
     e.currentTarget.setPointerCapture(e.pointerId);
   };
   const onPointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
@@ -1734,34 +2110,77 @@ function FloatingNova({ lang, label, chat }: { lang: Language; label: string; ch
         {open ? (
           <MessageCircle className="h-7 w-7" />
         ) : (
-          <img src={novaMascot} alt="Nova" className="pointer-events-none h-12 w-12 object-contain" draggable={false} />
+          <img
+            src={novaMascot}
+            alt="Nova"
+            className="pointer-events-none h-12 w-12 object-contain"
+            draggable={false}
+          />
         )}
       </button>
     </div>
   );
 }
 
-function EvidenceDrawer({ ids, fieldName, close, lang = "en" }: { ids: string[]; fieldName: string; close: () => void; lang?: Language }) {
+function EvidenceDrawer({
+  ids,
+  fieldName,
+  close,
+  lang = "en",
+}: {
+  ids: string[];
+  fieldName: string;
+  close: () => void;
+  lang?: Language;
+}) {
   const t = translations[lang] || translations.en;
   const items = evidence.filter((e) => ids.includes(e.id));
   return (
-    <div className="fixed inset-0 z-[1000] flex justify-end bg-foreground/50 backdrop-blur-sm" onClick={close}>
-      <div className="bg-background relative z-[1001] h-full w-full max-w-md overflow-y-auto p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-[1000] flex justify-end bg-foreground/50 backdrop-blur-sm"
+      onClick={close}
+    >
+      <div
+        className="bg-background relative z-[1001] h-full w-full max-w-md overflow-y-auto p-6 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between">
-          <h2 className="font-display flex items-center gap-2 text-2xl"><Info className="h-5 w-5" />{t.source}</h2>
-          <AgroButton size="icon" variant="ghost" onClick={close} aria-label={t.close}><X className="h-4 w-4" /></AgroButton>
+          <h2 className="font-display flex items-center gap-2 text-2xl">
+            <Info className="h-5 w-5" />
+            {t.source}
+          </h2>
+          <AgroButton size="icon" variant="ghost" onClick={close} aria-label={t.close}>
+            <X className="h-4 w-4" />
+          </AgroButton>
         </div>
-        <p className="text-muted-foreground mb-4 text-sm">{t.evidence}: {fieldName}</p>
+        <p className="text-muted-foreground mb-4 text-sm">
+          {t.evidence}: {fieldName}
+        </p>
         <div className="space-y-4">
           {items.map((e) => (
             <div key={e.id} className="clay-card p-4 text-sm">
-              <div className="flex justify-between"><b>{e.dataset}</b><Badge>{e.freshness}</Badge></div>
-              <p className="font-display text-2xl">{e.value} {e.unit}</p>
-              <p>{e.variable} · {e.date}</p>
-              <p className="mt-2"><b>{t.source}:</b> {e.source}</p>
-              <p><b>Resolution:</b> {e.resolution}</p>
-              <p><b>Processing:</b> {e.processing}</p>
-              <p className="text-muted-foreground"><b>Limitation:</b> {e.limitation}</p>
+              <div className="flex justify-between">
+                <b>{e.dataset}</b>
+                <Badge>{e.freshness}</Badge>
+              </div>
+              <p className="font-display text-2xl">
+                {e.value} {e.unit}
+              </p>
+              <p>
+                {e.variable} · {e.date}
+              </p>
+              <p className="mt-2">
+                <b>{t.source}:</b> {e.source}
+              </p>
+              <p>
+                <b>Resolution:</b> {e.resolution}
+              </p>
+              <p>
+                <b>Processing:</b> {e.processing}
+              </p>
+              <p className="text-muted-foreground">
+                <b>Limitation:</b> {e.limitation}
+              </p>
             </div>
           ))}
         </div>

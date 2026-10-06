@@ -10,13 +10,13 @@ export type OpenFarmCrop = {
   binomial_name: string | null;
   common_names: string[];
   description: string;
-  sun_requirements: string | null;        // "Full Sun", "Partial Sun", "Shade"
-  watering_interval: string | null;       // "1-2 days", etc.
+  sun_requirements: string | null; // "Full Sun", "Partial Sun", "Shade"
+  watering_interval: string | null; // "1-2 days", etc.
   planting_description: string | null;
   growing_degree_days: number | null;
-  row_spacing: number | null;             // cm
-  spread: number | null;                  // cm
-  height: number | null;                  // cm
+  row_spacing: number | null; // cm
+  spread: number | null; // cm
+  height: number | null; // cm
   days_to_maturity: number | null;
   processing_pictures: Array<{
     thumb_url: string;
@@ -28,9 +28,7 @@ const OPENFARM_BASE = "https://openfarm.cc/api/v1/crops";
 const OPENFARM_CACHE_KEY_PREFIX = "openfarm_crop_";
 const OPENFARM_CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-export async function fetchOpenFarmCrop(
-  cropName: string,
-): Promise<OpenFarmCrop | null> {
+export async function fetchOpenFarmCrop(cropName: string): Promise<OpenFarmCrop | null> {
   const cacheKey = `${OPENFARM_CACHE_KEY_PREFIX}${cropName.toLowerCase().trim()}`;
   if (typeof window !== "undefined") {
     try {
@@ -39,7 +37,9 @@ export async function fetchOpenFarmCrop(
         const { timestamp, data } = JSON.parse(cached) as { timestamp: number; data: OpenFarmCrop };
         if (Date.now() - timestamp < OPENFARM_CACHE_TTL) return data;
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   try {
@@ -93,7 +93,9 @@ export async function fetchOpenFarmCrop(
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: crop }));
-      } catch { /* storage guard */ }
+      } catch {
+        /* storage guard */
+      }
     }
 
     return crop;

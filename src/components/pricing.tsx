@@ -97,8 +97,7 @@ export function Pricing({ embedded = false }: { embedded?: boolean }) {
   const yearlyDiscount = (plan: (typeof SUBSCRIPTION_PLANS)[0]) => {
     if (plan.basePriceMonthlyUsd === 0) return null;
     const saving = Math.round(
-      ((plan.basePriceMonthlyUsd - plan.basePriceYearlyMonthlyUsd) /
-        plan.basePriceMonthlyUsd) *
+      ((plan.basePriceMonthlyUsd - plan.basePriceYearlyMonthlyUsd) / plan.basePriceMonthlyUsd) *
         100,
     );
     return saving > 0 ? saving : null;
@@ -123,8 +122,7 @@ export function Pricing({ embedded = false }: { embedded?: boolean }) {
           Grow at the speed of your farm
         </h2>
         <p className="text-muted-foreground mt-4 text-lg leading-relaxed">
-          Every smallholder deserves satellite agronomy. Start free — upgrade
-          when your farm grows.
+          Every smallholder deserves satellite agronomy. Start free — upgrade when your farm grows.
         </p>
       </div>
 
@@ -183,9 +181,7 @@ export function Pricing({ embedded = false }: { embedded?: boolean }) {
       <div className="mx-auto mt-10 grid max-w-5xl gap-6 lg:grid-cols-3">
         {SUBSCRIPTION_PLANS.map((plan) => {
           const price = formatPrice(
-            cycle === "yearly"
-              ? plan.basePriceYearlyMonthlyUsd
-              : plan.basePriceMonthlyUsd,
+            cycle === "yearly" ? plan.basePriceYearlyMonthlyUsd : plan.basePriceMonthlyUsd,
             currency,
             cycle,
           );
@@ -196,9 +192,7 @@ export function Pricing({ embedded = false }: { embedded?: boolean }) {
             <div
               key={plan.id}
               className={`clay-card relative flex flex-col p-6 transition-all duration-200 ${
-                plan.popular
-                  ? "ring-2 ring-primary shadow-xl shadow-primary/10"
-                  : ""
+                plan.popular ? "ring-2 ring-primary shadow-xl shadow-primary/10" : ""
               } ${isActive ? "ring-2 ring-leaf" : ""}`}
             >
               {/* Popular / Enterprise badge */}
@@ -237,9 +231,7 @@ export function Pricing({ embedded = false }: { embedded?: boolean }) {
                 </div>
               </div>
 
-              <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
-                {plan.tagline}
-              </p>
+              <p className="text-muted-foreground mt-3 text-sm leading-relaxed">{plan.tagline}</p>
 
               {/* Price */}
               <div className="mt-5 flex items-end gap-1.5">
@@ -346,11 +338,7 @@ export function Pricing({ embedded = false }: { embedded?: boolean }) {
           className="clay-btn mb-4 flex w-full items-center justify-between bg-secondary px-6 py-4 text-sm font-semibold"
         >
           <span>Compare all features</span>
-          {showComparison ? (
-            <ChevronUp className="h-5 w-5" />
-          ) : (
-            <ChevronDown className="h-5 w-5" />
-          )}
+          {showComparison ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
         </button>
 
         {showComparison && (
@@ -361,9 +349,7 @@ export function Pricing({ embedded = false }: { embedded?: boolean }) {
               {SUBSCRIPTION_PLANS.map((p) => (
                 <div
                   key={p.id}
-                  className={`p-4 text-center text-xs font-bold ${
-                    p.popular ? "text-primary" : ""
-                  }`}
+                  className={`p-4 text-center text-xs font-bold ${p.popular ? "text-primary" : ""}`}
                 >
                   {p.name}
                 </div>
@@ -371,9 +357,7 @@ export function Pricing({ embedded = false }: { embedded?: boolean }) {
             </div>
 
             {categories.map((cat) => {
-              const catFeatures = COMPARISON_FEATURES.filter(
-                (f) => f.category === cat,
-              );
+              const catFeatures = COMPARISON_FEATURES.filter((f) => f.category === cat);
               return (
                 <div key={cat}>
                   {/* Category header */}
@@ -451,9 +435,8 @@ export function Pricing({ embedded = false }: { embedded?: boolean }) {
               Need a plan for your cooperative or government extension?
             </p>
             <p className="mt-2 text-sm text-background/70">
-              Terra Enterprise supports 500+ farm plots, regional drought radar,
-              custom branded PDF reports, and a dedicated agronomist API. Let's
-              talk.
+              Terra Enterprise supports 500+ farm plots, regional drought radar, custom branded PDF
+              reports, and a dedicated agronomist API. Let's talk.
             </p>
           </div>
           <a
@@ -554,9 +537,7 @@ export function PricingModal({ onClose }: { onClose: () => void }) {
       aria-label="Subscription Plans"
     >
       <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background/80 px-6 py-4 backdrop-blur-sm">
-        <span className="font-display text-lg font-semibold">
-          AgroNova Plans
-        </span>
+        <span className="font-display text-lg font-semibold">AgroNova Plans</span>
         <button
           onClick={onClose}
           className="clay-btn bg-secondary px-5 py-2.5 text-sm font-semibold"
