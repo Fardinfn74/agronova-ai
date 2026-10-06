@@ -24,6 +24,7 @@ export function getGeminiApiKey(): string {
   const envKey =
     (typeof import.meta !== "undefined" &&
       ((import.meta.env as Record<string, string | undefined>)["VITE_GEMINI_API_KEY"] ||
+        (import.meta.env as Record<string, string | undefined>)["GEMINI_API_KEY"] ||
         (import.meta.env as Record<string, string | undefined>)["VITE_AI_API_KEY"])) ||
     (typeof process !== "undefined" &&
       (process.env["VITE_GEMINI_API_KEY"] || process.env["GEMINI_API_KEY"]));
@@ -92,7 +93,7 @@ export async function generateGeminiText(
     return {
       success: false,
       text: "",
-      error: "No Gemini API key configured. Add your free key in Profile settings or .env",
+      error: "No Gemini API key configured. Add VITE_GEMINI_API_KEY to your .env file.",
     };
   }
 
@@ -161,7 +162,7 @@ export async function diagnoseCropImage(
     return {
       success: false,
       text: "",
-      error: "No Gemini API key found. Add your free key in Profile settings.",
+      error: "No Gemini API key found. Add VITE_GEMINI_API_KEY to your .env file.",
     };
   }
 

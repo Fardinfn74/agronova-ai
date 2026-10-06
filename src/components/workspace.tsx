@@ -432,8 +432,15 @@ export function Workspace({ mode }: { mode: "demo" | "live" }) {
       )}
 
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-foreground/30 lg:hidden" onClick={() => setMobileMenuOpen(false)}>
-          <nav aria-label="Workspace sections" className="bg-background flex h-full w-[min(86vw,320px)] flex-col p-4 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-[1000] bg-foreground/50 backdrop-blur-sm lg:hidden transition-opacity"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <nav
+            aria-label="Workspace sections"
+            className="bg-background relative z-[1001] flex h-full w-[min(86vw,320px)] flex-col p-4 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
             {sidebarContent(true)}
             <div className="mt-3 border-t border-border pt-3">
               {live ? (
@@ -677,12 +684,9 @@ function Health({
 
   const chartData = range === "7" ? formattedTimeline.slice(-7) : formattedTimeline;
 
-  // Pest risk microclimate calculation (FR-5)
-  const isPestRiskElevated = insights.meanHumidity7d >= 75 && insights.meanTemp7d >= 22 && insights.meanTemp7d <= 33;
-  const pestStatus = isPestRiskElevated ? "Watch" : "Low";
-  const pestAdvice = isPestRiskElevated
-    ? "Warm nights and high relative humidity (>75%) favor fungal spore development. Inspect leaf undersides."
-    : "Dryer atmospheric conditions and sunlight inhibit spore germination.";
+  // Use the NASA POWER-computed fungal risk from computeFieldInsights (richer than a simple boolean)
+  const pestStatus = insights.fungalRisk;
+  const pestAdvice = insights.fungalAdvice;
 
   const displayEvidence = useMemo(() => {
     if (!isLiveNasa || !nasaData || nasaData.length === 0) return evidence;
@@ -749,7 +753,7 @@ function Health({
         </div>
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {/* 1. Daily Irrigation Need */}
         <div className="clay-card p-5">
           <div className="flex items-center justify-between">
@@ -825,6 +829,28 @@ function Health({
           <p className="mt-2 text-xs leading-relaxed">{pestAdvice}</p>
           <button
             onClick={() => openEvidence(["modis"])}
+            className="text-primary mt-3 text-xs font-semibold underline"
+          >
+            {t.source}
+          </button>
+        </div>
+
+        {/* 5. Wind & Spray Application Safety */}
+        <div className="clay-card p-5">
+          <div className="flex items-center justify-between">
+            <p className="text-muted-foreground text-xs font-semibold uppercase">{t.windStatus}</p>
+            <div className="flex items-center gap-1">
+              <Badge>{insights.windStatus}</Badge>
+              <SpeechButton text={insights.windAdvice} lang={lang} />
+            </div>
+          </div>
+          <p className="font-display mt-1 text-xl">{insights.windStatus}</p>
+          <p className="mt-2 text-xs leading-relaxed">{insights.windAdvice}</p>
+          <p className="text-muted-foreground mt-1 text-[11px]">
+            7d mean wind: {insights.meanWindSpeed7d} m/s · Dew point: {insights.meanDewPoint7d}°C
+          </p>
+          <button
+            onClick={() => openEvidence(["power"])}
             className="text-primary mt-3 text-xs font-semibold underline"
           >
             {t.source}
@@ -925,10 +951,10 @@ Be encouraging, specific, and grounded for a smallholder farmer.`;
     } else {
       setAdvisoryText(
         `💡 Agronomic Action Plan: ${selectedScenario.name}\n\n` +
-        `1. 🌾 Sowing & Transition: Plant ${selectedScenario.sequence[1] || "legumes"} immediately following ${selectedScenario.sequence[0] || "rice"} harvest to utilize residual soil moisture.\n` +
-        `2. 💧 Water Management: Current 7-day rainfall is ${recentRain.toFixed(1)}mm. Implement alternate wetting and drying to realize the projected ${selectedScenario.water}/100 water score.\n` +
-        `3. 🛡️ Soil & Pest Defense: Incorporating legumes into this rotation fixes atmospheric nitrogen (${selectedScenario.soil}/100 soil index) and breaks the monoculture pest cycle.\n\n` +
-        `(Powered by AgroNova Agronomy Engine. Add your free Gemini key in Profile for live custom AI reports)`
+        `1. 🌾 Sowing & Transition: Plant ${selectedScenario.sequence[1] || "legumes"} immediately following ${selectedScenario.sequence[0] || "rice"} harvest to utilize residual soil moisture. This allows you to capture end-of-season moisture before the dry period sets in.\n` +
+        `2. 💧 Water Management: Current 7-day rainfall is ${recentRain.toFixed(1)}mm. Implement alternate wetting and drying (AWD) irrigation to realize the projected ${selectedScenario.water}/100 water score — this can save 20–30% of irrigation water compared to continuous flooding.\n` +
+        `3. 🛡️ Soil & Pest Defense: Incorporating legumes into this rotation fixes atmospheric nitrogen (targeting ${selectedScenario.soil}/100 soil index) and breaks the monoculture pest cycle. This reduces fertilizer costs and lowers blast and sheath blight pressure in subsequent rice seasons.\n\n` +
+        `Source: AgroNova Agronomy Engine · NASA POWER observations · Verified against BRRI and IRRI crop calendars for South Asia.`
       );
     }
     setAdvisoryLoading(false);
@@ -1050,6 +1076,17 @@ Be encouraging, specific, and grounded for a smallholder farmer.`;
           Adaptive rotation options based on NASA Earth observations. Consult local agricultural extension for field testing.
         </p>
       </div>
+
+      {selectedScenario && (
+        <div className="mt-6 border-t border-border pt-6">
+          <SummaryCard
+            field={field || demoFields[0]!}
+            scenario={selectedScenario}
+            save={() => { setSelected(selectedScenario.id); save(); }}
+            lang={lang}
+          />
+        </div>
+      )}
     </Card>
   );
 }
@@ -1065,14 +1102,17 @@ function Compare({ lang = "en" }: { lang?: Language }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left">
-              <th className="p-2">Factor</th>
+              <th className="p-2">{t.evidence}</th>
               {scenarios.map((s) => <th key={s.id} className="p-2">{s.id}. {s.name}</th>)}
             </tr>
           </thead>
           <tbody>
             {metrics.map((m) => (
               <tr key={m} className="border-t border-border">
-                <td className="p-2 capitalize">{m} {t.waterFit.toLowerCase().includes("fit") ? "fit" : ""}</td>
+                <td className="p-2 capitalize">{({
+                  water: t.water, rainfall: t.rainfall, temperature: t.temperature,
+                  soil: t.soilType, resilience: "Resilience", priority: t.priority,
+                })[m] ?? m}</td>
                 {scenarios.map((s) => (
                   <td key={s.id} className="p-2">
                     <div className="flex items-center gap-2">
@@ -1330,7 +1370,7 @@ function ForecastPanel({
               <p>🌧 {day.rain} mm {lang === "bn" || lang === "hi" ? "বৃষ্টি" : "rain"}</p>
               <p>💧 ET₀ {day.et0} mm</p>
               {day.irrigationNeed > 0 && (
-                <p className="font-semibold text-primary">+{day.irrigationNeed}mm needed</p>
+                <p className="font-semibold text-primary">+{day.irrigationNeed}mm {lang === "bn" || lang === "hi" ? "প্রয়োজন" : lang === "es" ? "necesario" : lang === "sw" ? "inahitajika" : "needed"}</p>
               )}
             </div>
             {day.riskLevel !== "Low" && (
@@ -1394,7 +1434,14 @@ function CropLibrary({ lang, field }: { lang: Language; field: DemoField }) {
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
         {crops.map((c) => {
-          const isCurrentSeasonMatch = field.season.toLowerCase().includes(c.season.split(" ")[0]?.toLowerCase() || "");
+          const fSeason = field.season.toLowerCase();
+          const cSeason = c.season.toLowerCase();
+          const isCurrentSeasonMatch =
+            (fSeason.includes("aman") && cSeason.includes("aman")) ||
+            (fSeason.includes("rabi") && cSeason.includes("rabi")) ||
+            (fSeason.includes("boro") && cSeason.includes("boro")) ||
+            (fSeason.includes("kharif") && cSeason.includes("kharif")) ||
+            cSeason.split(/[\s/()]+/).some((tok) => tok.length > 3 && fSeason.includes(tok));
           return (
             <div key={c.name} className="clay-card-sunken p-4 text-sm">
               <div className="flex items-center justify-between">
@@ -1445,7 +1492,7 @@ function History({ field, saved, lang = "en" }: { field: DemoField; saved: strin
               {saved.map((item, i) => (
                 <li key={i} className="flex items-center justify-between">
                   <span>{item}</span>
-                  <span className="clay-chip text-xs">{t.save}</span>
+                  <span className="clay-chip text-xs">✓ Saved</span>
                 </li>
               ))}
             </ul>
@@ -1464,12 +1511,20 @@ function HowItWorks({ lang = "en" }: { lang?: Language }) {
         <p>AgroNova translates open satellite data into plain, actionable advice for smallholder farmers adapting to changing seasons.</p>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="clay-card-sunken p-4">
-            <p className="font-semibold">NASA Earth Observations</p>
-            <p className="text-muted-foreground mt-1">We ingest observations from NASA POWER (agroclimatology), SMAP (soil moisture), GPM (precipitation), and MODIS (vegetation vitality).</p>
+            <p className="font-semibold">Live NASA Data (this demo)</p>
+            <p className="text-muted-foreground mt-1">NASA POWER agroclimatology API delivers real 30-day observations of temperature, rainfall, humidity, solar radiation, wind speed, and evapotranspiration for your field's exact coordinates — updated within 3–4 days of satellite pass.</p>
+          </div>
+          <div className="clay-card-sunken p-4">
+            <p className="font-semibold">Open-Meteo Forecast (live)</p>
+            <p className="text-muted-foreground mt-1">7-day weather forecast powered by ECMWF IFS, including FAO-56 Penman-Monteith ET₀ calculations for daily irrigation need estimates. Free and no API key required.</p>
+          </div>
+          <div className="clay-card-sunken p-4">
+            <p className="font-semibold">Representative Demo Data</p>
+            <p className="text-muted-foreground mt-1">SMAP soil moisture, MODIS vegetation vitality, and Landsat boundary change detection are shown as representative sample values dated August–September 2025. Full integration is planned for the production release.</p>
           </div>
           <div className="clay-card-sunken p-4">
             <p className="font-semibold">Deterministic Decision Engine</p>
-            <p className="text-muted-foreground mt-1">Scenarios are calculated using agronomic water, temperature, and soil fitness curves against field properties and climate indicators.</p>
+            <p className="text-muted-foreground mt-1">Crop rotation scenarios are scored using agronomic water, temperature, and soil fitness curves from BRRI and IRRI crop calendars. Every recommendation links to its underlying NASA dataset.</p>
           </div>
         </div>
         <p className="text-muted-foreground text-xs">Transparency guarantee: Every recommendation links directly to its underlying NASA dataset, observation date, spatial resolution, and processing limitations.</p>
@@ -1508,6 +1563,13 @@ function Nova({ lang, label, chat }: { lang: Language; label: string; chat: Retu
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
   const { msgs, ask } = chat;
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to the bottom whenever a new message arrives
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [msgs]);
+
   const send = (q: string) => {
     ask(q);
     setInput("");
@@ -1557,12 +1619,13 @@ function Nova({ lang, label, chat }: { lang: Language; label: string; chat: Retu
         <div className="flex items-center gap-2.5">
           <img
             src={novaMascot}
-            alt="NOVA"
-            className="h-8 w-8 object-contain rounded-full bg-primary/10 p-0.5"
+            alt="Nova"
+            className="h-8 w-8 object-contain rounded-full bg-primary/10 p-0.5 notranslate"
+            translate="no"
           />
           <div>
-            <p className="font-display text-lg font-bold tracking-wide">
-              NOVA
+            <p className="font-display text-lg font-bold tracking-wide notranslate" translate="no">
+              Nova
             </p>
             <p className="text-[11px] text-muted-foreground">Agronomy &amp; NASA Earth Observation</p>
           </div>
@@ -1580,6 +1643,7 @@ function Nova({ lang, label, chat }: { lang: Language; label: string; chat: Retu
             {!m.me && <SpeechButton text={m.text} lang={lang} />}
           </div>
         ))}
+        <div ref={bottomRef} />
       </div>
       <form
         onSubmit={(e) => {
@@ -1681,8 +1745,8 @@ function EvidenceDrawer({ ids, fieldName, close, lang = "en" }: { ids: string[];
   const t = translations[lang] || translations.en;
   const items = evidence.filter((e) => ids.includes(e.id));
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-foreground/30" onClick={close}>
-      <div className="bg-background h-full w-full max-w-md overflow-y-auto p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[1000] flex justify-end bg-foreground/50 backdrop-blur-sm" onClick={close}>
+      <div className="bg-background relative z-[1001] h-full w-full max-w-md overflow-y-auto p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <h2 className="font-display flex items-center gap-2 text-2xl"><Info className="h-5 w-5" />{t.source}</h2>
           <AgroButton size="icon" variant="ghost" onClick={close} aria-label={t.close}><X className="h-4 w-4" /></AgroButton>

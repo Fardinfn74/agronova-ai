@@ -56,8 +56,20 @@ export function FieldMap({
     }
 
     const timer = setTimeout(() => instance.invalidateSize(), 150);
+
+    const resizeObserver = typeof ResizeObserver !== "undefined"
+      ? new ResizeObserver(() => {
+          instance.invalidateSize();
+        })
+      : null;
+
+    if (resizeObserver && holder.current) {
+      resizeObserver.observe(holder.current);
+    }
+
     return () => {
       clearTimeout(timer);
+      resizeObserver?.disconnect();
       instance.remove();
       map.current = null;
       markers.current = null;

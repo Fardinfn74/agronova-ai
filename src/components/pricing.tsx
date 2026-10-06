@@ -548,7 +548,7 @@ export function PlanBadge({ onClick }: { onClick?: () => void }) {
 export function PricingModal({ onClose }: { onClose: () => void }) {
   return (
     <div
-      className="fixed inset-0 z-[100] overflow-y-auto bg-background/95 backdrop-blur-md"
+      className="fixed inset-0 z-[1100] overflow-y-auto bg-background/95 backdrop-blur-md"
       role="dialog"
       aria-modal="true"
       aria-label="Subscription Plans"

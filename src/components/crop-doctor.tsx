@@ -277,7 +277,7 @@ export function CropDoctor({ lang }: { lang: Language }) {
     if (res.success && res.text) {
       setAiReport(res.text);
     } else {
-      setAiReport(`⚠️ AI Diagnosis Note:\n${res.error || "Could not complete diagnosis. Please verify your Gemini API key in Profile settings."}`);
+      setAiReport(`⚠️ AI Diagnosis Note:\n${res.error || "Could not complete Gemini Vision diagnosis. Please check your API key in Profile settings."}`);
     }
     setAnalyzing(false);
   };
@@ -364,7 +364,7 @@ export function CropDoctor({ lang }: { lang: Language }) {
             </div>
             {!hasApiKey && (
               <span className="rounded bg-amber-500/20 px-2 py-0.5 text-amber-700 dark:text-amber-300 font-medium">
-                Tip: Enter your free API key in Profile to enable live AI vision
+                AI vision requires a Google Gemini API key — set one in your profile settings
               </span>
             )}
           </div>

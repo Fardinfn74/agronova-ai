@@ -171,6 +171,12 @@ function Hero() {
           >
             Try Demo Field <ArrowRight className="h-4 w-4" />
           </Link>
+          <Link
+            to="/auth"
+            className="clay-btn inline-flex items-center gap-2 bg-secondary px-7 py-3.5 font-semibold text-secondary-foreground"
+          >
+            Sign up free
+          </Link>
         </div>
 
       </div>
@@ -183,7 +189,7 @@ const nasaSources = [
   "GPM · Rainfall",
   "Landsat · Field change",
   "MODIS · Crop health",
-  "Sentinel-2 · NDVI",
+  "FIRMS · Fire alerts",
 ];
 
 function DataStrip() {
@@ -322,7 +328,7 @@ function NovaSection() {
                   height={1024}
                 />
                 <div>
-                  <p className="text-sm font-semibold">Nova</p>
+                  <p className="text-sm font-semibold notranslate" translate="no">Nova</p>
                   <p className="text-leaf-deep text-xs font-medium">
                     online · watching your fields
                   </p>
@@ -347,24 +353,28 @@ function NovaSection() {
             </div>
             <div className="mt-4 flex flex-wrap gap-2 px-1">
               {quickReplies.map((q) => (
-                <span
+                <Link
                   key={q}
-                  className="clay-chip bg-card px-4 py-2 text-sm font-medium text-foreground/80"
+                  to="/demo"
+                  className="clay-chip bg-card px-4 py-2 text-sm font-medium text-foreground/80 transition hover:bg-primary/10 hover:text-primary"
                 >
                   {q}
-                </span>
+                </Link>
               ))}
             </div>
-            <div className="clay-card-sunken mt-4 flex items-center justify-between gap-3 px-5 py-3.5">
-              <span className="text-sm text-muted-foreground">
-                Ask about your field…
+            <Link
+              to="/demo"
+              className="clay-card-sunken group mt-4 flex items-center justify-between gap-3 px-5 py-3.5 transition hover:border-primary/40 hover:bg-card/90"
+            >
+              <span className="text-sm text-muted-foreground group-hover:text-foreground">
+                Ask Nova live in the interactive workspace…
               </span>
-              <span className="clay-btn flex h-10 w-10 items-center justify-center bg-primary">
+              <span className="clay-btn flex h-10 w-10 items-center justify-center bg-primary transition-transform group-hover:scale-105">
                 <Send className="h-4 w-4 text-primary-foreground" />
               </span>
-            </div>
+            </Link>
             <p className="text-muted-foreground mt-3 px-2 text-center text-xs">
-              Demo conversation — the real Nova answers from live NASA data.
+              Preview shown — click to open Nova in the full workspace with live NASA Earth observations.
             </p>
           </div>
         </div>
@@ -466,9 +476,9 @@ function Features() {
 }
 
 const mapStats = [
-  { label: "Fields monitored", value: "12,400+" },
-  { label: "Avg. health score", value: "87%" },
-  { label: "Data updates / week", value: "3–5" },
+  { label: "NASA & Climate Streams", value: "5+" },
+  { label: "Spatial Grid Resolution", value: "0.5°" },
+  { label: "Satellite Observation", value: "Daily" },
 ];
 
 function FieldShift() {
@@ -548,8 +558,8 @@ const farmerPoints = [
   },
   {
     icon: WifiOff,
-    title: "Works without internet",
-    body: "Advice by SMS or voice call when the signal drops. Data waits, answers don't.",
+    title: "Works offline too",
+    body: "Field health data is cached so you can review your latest satellite readings even without an internet connection. Advice doesn't disappear when signal drops.",
   },
   {
     icon: Sprout,
@@ -624,14 +634,14 @@ function FinalCta() {
           — Field Shift. We're building it with and for farming communities.
         </p>
         <div className="mt-9 flex flex-wrap justify-center gap-4">
-          <a
-            href="#nova"
+          <Link
+            to="/demo"
             className="clay-btn bg-primary px-8 py-4 font-semibold text-primary-foreground"
           >
-            Start asking Nova
-          </a>
+            Try the interactive demo
+          </Link>
           <Link
-            to="/pricing"
+            to="/auth"
             className="clay-btn bg-secondary px-8 py-4 font-semibold text-secondary-foreground"
           >
             See plans &amp; pricing

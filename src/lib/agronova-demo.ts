@@ -881,10 +881,6 @@ export function novaReply(question: string, language: Language, selected: Scenar
     "pest", "disease", "fertilizer", "urea", "nitrogen", "npk", "fungus", "blight", "rust",
     "rot", "yield", "rotation", "harvest", "sowing", "weather", "nasa", "smap", "power",
     "gpm", "climate", "temp", "humidity", "moisture", "drought", "flood", "loam", "clay",
-    "কৃষি", "ফসল", "জমি", "মাটি", "ধান", "গম", "সার", "কীটপতঙ্গ", "বৃষ্টি", "আবর্তন",
-    "खेती", "फसल", "खेत", "मिट्टी", "धान", "गेहूं", "उर्वरक", "कीट", "बारिश", "चक्र",
-    "agricultura", "cultivo", "suelo", "riego", "plaga", "enfermedad", "clima", "cosecha",
-    "kilimo", "mazao", "udongo", "maji", "mvua", "wadudu", "mbolea",
   ];
 
   const hasAgri = agriKeywords.some((term) => q.includes(term));
@@ -895,84 +891,98 @@ export function novaReply(question: string, language: Language, selected: Scenar
 
   if (isOffTopic) {
     if (language === "bn") {
-      return "আমি নোভা, আপনার নিবেদিত কৃষি ও ফসল বিশেষজ্ঞ। আমি কেবলমাত্র কৃষিকাজ, ফসল আবর্তন, মাটির স্বাস্থ্য, রোগবালাই দমন এবং নাসার স্যাটেলাইট তথ্য সম্পর্কিত বিষয়ে উত্তর দিতে পারি। আপনার জমি বা ফসল নিয়ে যেকোনো প্রশ্ন করুন!";
+      return "à¦†à¦®à¦¿ à¦¨à§‹à¦­à¦¾, à¦†à¦ªà¦¨à¦¾à¦° à¦¨à¦¿à¦¬à§‡à¦¦à¦¿à¦¤ à¦•à§ƒà¦·à¦¿ à¦“ à¦«à¦¸à¦² à¦¬à¦¿à¦¶à§‡à¦·à¦œà§à¦žà¥¤ à¦†à¦®à¦¿ à¦•à§‡à¦¬à¦²à¦®à¦¾à¦¤à§à¦° à¦•à§ƒà¦·à¦¿à¦•à¦¾à¦œ, à¦«à¦¸à¦² à¦†à¦¬à¦°à§à¦¤à¦¨, à¦®à¦¾à¦Ÿà¦¿à¦° à¦¸à§à¦¬à¦¾à¦¸à§à¦¥à§à¦¯, à¦°à§‹à¦—à¦¬à¦¾à¦²à¦¾à¦‡ à¦¦à¦®à¦¨ à¦à¦¬à¦‚ à¦¨à¦¾à¦¸à¦¾à¦° à¦¸à§à¦¯à¦¾à¦Ÿà§‡à¦²à¦¾à¦‡à¦Ÿ à¦¤à¦¥à§à¦¯ à¦¸à¦®à§à¦ªà¦°à§à¦•à¦¿à¦¤ à¦¬à¦¿à¦·à¦¯à¦¼à§‡ à¦‰à¦¤à§à¦¤à¦° à¦¦à¦¿à¦¤à§‡ à¦ªà¦¾à¦°à¦¿à¥¤ à¦†à¦ªà¦¨à¦¾à¦° à¦œà¦®à¦¿ à¦¬à¦¾ à¦«à¦¸à¦² à¦¨à¦¿à¦¯à¦¼à§‡ à¦¯à§‡à¦•à§‹à¦¨à§‹ à¦ªà§à¦°à¦¶à§à¦¨ à¦•à¦°à§à¦¨!";
     }
     if (language === "hi") {
-      return "मैं नोवा हूँ, आपका समर्पित कृषि और फसल विशेषज्ञ। मैं केवल खेती, फसल चक्र, मिट्टी के स्वास्थ्य, रोग प्रबंधन और नासा उपग्रह जलवायु डेटा से संबंधित प्रश्नों में ही सहायता कर सकता हूँ। कृपया अपने खेत या फसल से संबंधित कोई प्रश्न पूछें!";
+      return "à¦®à§ˆ à¦¨à§‹à¦­à¦¾ à¦¹à§, à¦†à¦ªà¦•à¦¾ à¦¸à¦®à¦°à§à¦ªà¦¿à¦¤ à¦•à§ƒà¦·à¦¿ à¦¬à¦¿à¦¶à§‡à¦·à¦œà§à¦žà¥¤ à¦•à§‡à¦¬à¦² à¦–à§‡à¦¤à¦¿, à¦«à¦¸à¦² à¦šà¦•à§à¦°, à¦®à¦¿à¦Ÿà§à¦Ÿà¦¿ à¦¸à§à¦¬à¦¾à¦¸à§à¦¥à§à¦¯, à¦°à§‹à¦— à¦ªà§à¦°à¦¬à¦¨à§à¦§à¦¨ à¦à¦¬à¦‚ NASA à¦‰à¦ªà¦—à§à¦°à¦¹ à¦¡à§‡à¦Ÿà¦¾ à¦¸à¦®à§à¦ªà¦°à§à¦•à¦¿à¦¤ à¦ªà§à¦°à¦¶à§à¦¨à§‡ à¦¸à¦¾à¦¹à¦¾à¦¯à§à¦¯ à¦•à¦°à¦¤à§‡ à¦ªà¦¾à¦°à¦¿à¥¤ à¦†à¦ªà¦¨à¦¾à¦° à¦–à§‡à¦¤ à¦¬à¦¾ à¦«à¦¸à¦² à¦¸à¦®à§à¦ªà¦°à§à¦•à¦¿à¦¤ à¦•à§‹à¦¨à§‹ à¦ªà§à¦°à¦¶à§à¦¨ à¦œà¦¿à¦œà§à¦žà¦¾à¦¸à¦¾ à¦•à¦°à§à¦¨!";
     }
     if (language === "es") {
-      return "Soy Nova, tu especialista agronómico y de cultivos. Solo puedo responder preguntas sobre agricultura, rotación de cultivos, salud del suelo, patología vegetal y datos satelitales de la NASA. ¡Hazme una pregunta sobre tus cultivos!";
+      return "Soy Nova, tu especialista agronÃ³mico y de cultivos. Solo puedo responder preguntas sobre agricultura, rotaciÃ³n de cultivos, salud del suelo, patologÃ­a vegetal y datos satelitales de la NASA.";
     }
     if (language === "sw") {
-      return "Mimi ni Nova, mtaalamu wako wa kilimo na mazao. Ninaweza kujibu maswali yanayohusu kilimo, mzunguko wa mazao, afya ya udongo, magonjwa ya mimea, na takwimu za satelaiti za NASA pekee. Tafadhali niulize swali kuhusu shamba lako!";
+      return "Mimi ni Nova, mtaalamu wako wa kilimo na mazao. Ninaweza kujibu maswali yanayohusu kilimo, mzunguko wa mazao, afya ya udongo, magonjwa ya mimea, na takwimu za satelaiti za NASA pekee.";
     }
-    return "I am Nova, your specialized agricultural companion. I am exclusively trained to assist with farming, crop rotations, soil health, plant pathology, and NASA satellite climate data for your fields. Please ask me a farming or crop-related question!";
+    return "I am Nova, your specialized agricultural companion. I am exclusively trained to assist with farming, crop rotations, soil health, plant pathology, and NASA satellite climate data. Please ask a farming-related question!";
   }
 
-  // Bengali responses
-  if (language === "bn") {
-    if (q.includes("nasa") || q.includes("স্যাটেলাইট") || q.includes("তথ্য")) {
-      return `এই সুপারিশে NASA SMAP-এর মাটির আর্দ্রতা, GPM-এর বৃষ্টিপাত এবং POWER-এর তাপমাত্রা ও বিকিরণ তথ্য ব্যবহার করা হয়েছে। এই উপগ্রহ তথ্যগুলো মাটির পানির ঘাটতি ও ফসল বোনার উপযুক্ত সময় নির্ধারণে সাহায্য করে।`;
+  // â”€â”€â”€ GREETING & SHORT INPUTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const isGreeting = ["hi", "hello", "hey", "howdy", "good morning", "good evening", "good afternoon", "namaste", "salam"].some(
+    (g) => q === g || q.startsWith(g + " ") || q.endsWith(" " + g)
+  ) || q.length <= 5;
+
+  if (isGreeting) {
+    if (language === "bn") {
+      return `à¦†à¦¸à§à¦¸à¦¾à¦²à¦¾à¦®à§ à¦†à¦²à¦¾à¦‡à¦•à§à¦®! à¦†à¦®à¦¿ à¦¨à§‹à¦­à¦¾ â€” à¦†à¦ªà¦¨à¦¾à¦° NASA-à¦šà¦¾à¦²à¦¿à¦¤ à¦•à§ƒà¦·à¦¿ à¦¬à¦¿à¦¶à§‡à¦·à¦œà§à¦žà¥¤ à¦†à¦ªà¦¨à¦¾à¦° à¦¸à¦•à§à¦°à¦¿à¦¯à¦¼ à¦«à¦¸à¦² à¦šà¦•à§à¦°: ${selected.sequence.join(" -> ")} (${selected.name})à¥¤ à¦œà¦¿à¦œà§à¦žà§‡à¦¸ à¦•à¦°à§à¦¨: à¦¸à¦¾à¦° à¦“ à¦¸à§‡à¦šà§‡à¦° à¦ªà¦°à¦¾à¦®à¦°à§à¦¶, à¦°à§‹à¦—à¦¬à¦¾à¦²à¦¾à¦‡ à¦¶à¦¨à¦¾à¦•à§à¦¤à¦•à¦°à¦£, à¦†à¦¬à¦¹à¦¾à¦“à¦¯à¦¼à¦¾ à¦“ NASA à¦¡à§‡à¦Ÿà¦¾, à¦¬à¦¾ à¦«à¦²à¦¨ à¦¬à¦¾à¦¡à¦¼à¦¾à¦¨à§‹à¦° à¦‰à¦ªà¦¾à¦¯à¦¼à¥¤`;
     }
-    if (q.includes("পানি") || q.includes("বৃষ্টি") || q.includes("সেচ")) {
-      return `${selected.name} আবর্তনে পানি সাশ্রয়ের হার প্রায় ${selected.water}/১০০। ধান কাটার পর ডালজাতীয় ফসল করলে মাটির অবশিষ্ট আর্দ্রতা কাজে লাগে এবং অতিরিক্ত সেচের খরচ বেঁচে যায়।`;
+    if (language === "hi") {
+      return `Namaste! Main Nova hun â€” aapka NASA-powered krishi sahayak. Aapka fasal chakra: ${selected.sequence.join(" -> ")} (${selected.name}). Mujhse poochhen: khaad aur sichai, roga-keeda niyantran, NASA mausam data, ya upaj badhane ke tarike.`;
     }
-    if (q.includes("মাটি") || q.includes("সার") || q.includes("নাইট্রোজেন")) {
-      return `এই আবর্তনে লেগুমিনাস (মুগ ডাল) ফসল অন্তর্ভুক্ত করায় রাইজোবিয়াম ব্যাকটেরিয়ার মাধ্যমে বায়ুমণ্ডল থেকে প্রাকৃতিকভাবে নাইট্রোজেন সংবদ্ধিত হয়, ফলে পরবর্তী ফসলে ইউরিয়া সারের ব্যবহার ২০-২৫% কম লাগে।`;
+    if (language === "es") {
+      return `Hola! Soy Nova, tu asistente agronÃ³mico NASA. Tu rotaciÃ³n activa: ${selected.sequence.join(" -> ")} (${selected.name}). Puedo ayudarte con fertilizaciÃ³n, plagas, datos NASA, o consejos de cosecha.`;
     }
-    if (q.includes("রোগ") || q.includes("বালাই") || q.includes("কীটপতঙ্গ")) {
-      return `একই জমিতে বারবার এক ফসল চাষ করলে মাটিতে ক্ষতিকর জীবাণু জমা হয়। ${selected.sequence.join(" → ")} চক্র অনুসরণ করলে পোকামাকড় ও ব্লাস্ট রোগের জীবনচক্র ভেঙে যায়।`;
+    if (language === "sw") {
+      return `Habari! Mimi ni Nova, mshauri wako wa kilimo wa NASA. Mzunguko wako: ${selected.sequence.join(" -> ")} (${selected.name}). Ninaweza kukusaidia na mbolea, wadudu, data ya NASA, au kuboresha mavuno.`;
     }
-    return `${selected.name} আবর্তনটি আপনার জমির জন্য সর্বোত্তম। এটি NASA Earth ডাটার সাথে সংগতিপূর্ণ এবং পানির চাপ কমিয়ে মাটির উর্বরতা বাড়ায়।`;
+    return `Hello! I'm Nova, your NASA-powered agronomy assistant. Your active rotation: **${selected.sequence.join(" -> ")}** (${selected.name}). Ask me about:\nâ€¢ Fertilizer & irrigation timing\nâ€¢ Pest & disease identification\nâ€¢ Soil health & NASA satellite insights\nâ€¢ Tips to boost your yield\n\nWhat would you like to know about your field?`;
   }
 
-  // Hindi responses
-  if (language === "hi") {
-    if (q.includes("nasa") || q.includes("उपग्रह") || q.includes("डेटा")) {
-      return `यह सलाह NASA SMAP मिट्टी की नमी, GPM उपग्रह वर्षा और POWER कृषि-जलवायु डेटा पर आधारित है। यह उपग्रह डेटा मिट्टी की जल आवश्यकता और सटीक बुवाई का समय निर्धारित करने में मदद करता है।`;
+  // â”€â”€â”€ FIELD PROBLEM / DISTRESS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const hasProblem = ["not okay", "problem", "issue", "worried", "bad", "wrong", "help", "trouble", "dying", "yellow", "wilting", "dry", "wet", "flooded", "sick", "poor yield", "low yield", "not growing"].some(
+    (p) => q.includes(p)
+  );
+
+  if (hasProblem) {
+    if (language === "bn") {
+      return `à¦†à¦ªà¦¨à¦¾à¦° à¦œà¦®à¦¿à¦¤à§‡ à¦¸à¦®à¦¸à§à¦¯à¦¾ à¦¹à¦šà§à¦›à§‡ à¦œà§‡à¦¨à§‡ à¦¦à§à¦ƒà¦–à¦¿à¦¤! à¦¦à§à¦°à§à¦¤ à¦¸à¦¹à¦¾à¦¯à¦¼à¦¤à¦¾à¦° à¦œà¦¨à§à¦¯ à¦¬à¦²à§à¦¨:\n- à¦²à¦•à§à¦·à¦£ à¦•à§€? (à¦ªà¦¾à¦¤à¦¾ à¦¹à¦²à§à¦¦, à¦¶à§à¦•à¦¾à¦¨à§‹, à¦ªà§‹à¦•à¦¾?)\n- à¦ªà¦¾à¦¨à¦¿à¦° à¦…à¦¬à¦¸à§à¦¥à¦¾? (à¦¬à¦¨à§à¦¯à¦¾ à¦¨à¦¾à¦•à¦¿ à¦–à¦°à¦¾?)\n- à¦•à¦¤à¦¦à¦¿à¦¨ à¦§à¦°à§‡ à¦à¦‡ à¦¸à¦®à¦¸à§à¦¯à¦¾?\n\nà¦†à¦ªà¦¨à¦¾à¦° ${selected.sequence[0]} à¦«à¦¸à¦²à§‡ à¦¸à¦¾à¦§à¦¾à¦°à¦£ à¦¸à¦®à¦¸à§à¦¯à¦¾: à¦¨à¦¾à¦‡à¦Ÿà§à¦°à§‹à¦œà§‡à¦¨à§‡à¦° à¦˜à¦¾à¦Ÿà¦¤à¦¿, à¦›à¦¤à§à¦°à¦¾à¦•à¦œà¦¨à¦¿à¦¤ à¦°à§‹à¦—, à¦¬à¦¾ à¦…à¦¨à¦¿à¦¯à¦¼à¦®à¦¿à¦¤ à¦¸à§‡à¦šà¥¤ à¦¬à¦¿à¦¸à§à¦¤à¦¾à¦°à¦¿à¦¤ à¦²à¦¿à¦–à§à¦¨!`;
     }
-    if (q.includes("पानी") || q.includes("बारिश") || q.includes("सिंचाई")) {
-      return `${selected.name} चक्र जल दक्षता स्कोर ${selected.water}/100 प्रदान करता है। दलहनी फसलों को शामिल करने से भूजल का अत्यधिक दोहन रुकता है और सिंचाई लागत कम होती है।`;
+    if (language === "es") {
+      return `Lamento escuchar eso! Para diagnosticar mejor:\n- Que sintomas ves? (hojas amarillas, marchitamiento, plagas?)\n- Como esta la humedad? (inundacion o sequia?)\n- Cuanto tiempo lleva el problema?\n\nPara ${selected.sequence[0]}: causas comunes incluyen deficiencia de nutrientes, hongos, o estres hidrico.`;
     }
-    if (q.includes("रोग") || q.includes("कीट") || q.includes("कीड़ा")) {
-      return `${selected.sequence.join(" → ")} का फसल चक्र अपनाने से मिट्टी में पैदा होने वाले रोगजनकों और कीटों का चक्र टूट जाता है, जिससे कीटनाशकों का खर्च कम होता है।`;
+    if (language === "sw") {
+      return `Pole kusikia tatizo! Ili kukusaidia:\n- Dalili gani? (majani ya njano, kunyauka, wadudu?)\n- Hali ya maji? (mafuriko au ukame?)\n- Tatizo limeanza lini?\n\nKwa zao la ${selected.sequence[0]}: sababu za kawaida ni upungufu wa virutubisho, ukungu, au maji yasiyofaa.`;
     }
-    return `${selected.name} विकल्प का चयन जल उपयोग संतुलन और मौसमी उपयुक्तता के लिए अनुशंसित है। यह परिदृश्य नासा डेटा पर आधारित है।`;
+    return `Sorry to hear your field isn't doing well! To give you the best advice, please tell me:\n\n- What symptoms do you see? (yellowing leaves, wilting, spots, pests?)\n- What is the water situation? (waterlogged, drought, or normal?)\n- How long has this been going on?\n\nFor your **${selected.sequence[0]}** crop, common causes include nutrient deficiency (especially nitrogen), fungal infections, or irregular irrigation. Share details and I'll help diagnose it!`;
   }
 
-  // Spanish responses
-  if (language === "es") {
-    if (q.includes("nasa") || q.includes("satélite") || q.includes("datos")) {
-      return `Esta recomendación integra observaciones satelitales de humedad del suelo NASA SMAP, lluvia de GPM IMERG y radiación/temperatura de POWER para maximizar la resiliencia climática del cultivo.`;
-    }
-    if (q.includes("agua") || q.includes("lluvia") || q.includes("riego")) {
-      return `La rotación ${selected.name} tiene un puntaje de ajuste hídrico de ${selected.water}/100, reduciendo el estrés en periodos de sequía mediante cultivos de ciclo corto.`;
-    }
-    return `La opción ${selected.name} (${selected.sequence.join(" → ")}) equilibra el consumo de agua, fija nitrógeno en el suelo y rompe ciclos de plagas comunes.`;
+  // â”€â”€â”€ ADVICE REQUEST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const wantsAdvice = ["what should", "what to do", "how to", "advice", "suggest", "recommend", "tell me", "guide", "help me"].some(
+    (p) => q.includes(p)
+  );
+
+  if (wantsAdvice) {
+    return `Here's what I recommend for your **"${selected.name}"** plan:\n\n- Action: ${selected.action}\n- Rotation: ${selected.sequence.join(" -> ")}\n- Water efficiency: ${selected.water}/100\n- Soil health: ${selected.soil}/100\n- Climate resilience: ${selected.resilience}/100\n\nBased on NASA satellite data: test your soil before the next planting and include legumes to naturally fix nitrogen, reducing urea use by 20-25%.`;
   }
 
-  // Swahili responses
-  if (language === "sw") {
-    if (q.includes("nasa") || q.includes("satelaiti") || q.includes("takwimu")) {
-      return `Ushauri huu unatumia data ya unyevu wa udongo ya NASA SMAP, mvua ya GPM, na joto/mionzi ya POWER kusaidia kupanga upanzi kulingana na msimu.`;
-    }
-    return `Mzunguko wa ${selected.name} (${selected.sequence.join(" → ")}) unalinda shamba lako dhidi ya ukame kwa kuboresha afya ya udongo na kupunguza matumizi ya maji.`;
-  }
-
-  // English responses
+  // â”€â”€â”€ KEYWORD-BASED RESPONSES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (q.includes("nasa") || q.includes("satellite") || q.includes("data") || q.includes("smap") || q.includes("power")) {
-    return "This agronomic advice is directly calibrated using NASA SMAP (root-zone soil moisture), GPM IMERG (satellite precipitation estimates), and NASA POWER (daily solar irradiance, temperature, and relative humidity). These Earth observations ensure planting schedules match actual soil moisture rather than guesswork.";
+    return "This agronomic advice is calibrated using NASA SMAP (root-zone soil moisture), GPM IMERG (satellite precipitation), and NASA POWER (solar irradiance, temperature, humidity). These Earth observations ensure planting schedules match actual soil moisture rather than guesswork.";
   }
   if (q.includes("rain") || q.includes("water") || q.includes("irrigation") || q.includes("drought")) {
-    return `${selected.name} scores ${selected.water}/100 for water-fit. By rotating from high-demand paddy rice into low-water pulses, you conserve groundwater and capitalize on residual root-zone moisture detected by NASA SMAP.`;
+    return `${selected.name} scores ${selected.water}/100 for water-fit. Rotating from high-demand paddy rice into low-water pulses conserves groundwater and uses residual root-zone moisture detected by NASA SMAP.`;
   }
   if (q.includes("soil") || q.includes("fertilizer") || q.includes("nitrogen") || q.includes("nutrient")) {
-    return `In this sequence (${selected.sequence.join(" → ")}), introducing legumes fixes atmospheric nitrogen into the soil (soil score: ${selected.soil}/100). This reduces synthetic urea/NPK requirements by 20-30% for the subsequent cereal crop.`;
+    return `In your rotation (${selected.sequence.join(" -> ")}), legumes fix atmospheric nitrogen into the soil (soil score: ${selected.soil}/100). This reduces synthetic urea/NPK requirements by 20-30% for the subsequent cereal crop.`;
   }
   if (q.includes("pest") || q.includes("disease") || q.includes("blast") || q.includes("blight") || q.includes("fungus")) {
-    return `Monoculture cultivations build up soil-borne pathogens and insect populations. Switching crops through ${selected.sequence.join(" → ")} disrupts host availability, suppressing stem borers, fungal blast, and root rots naturally.`;
+    return `Monoculture builds up soil-borne pathogens and insect populations. Your rotation ${selected.sequence.join(" -> ")} disrupts host availability, suppressing stem borers, fungal blast, and root rots naturally.`;
   }
-  return `${selected.name} (${selected.sequence.join(" → ")}) is prioritized for your field because it balances seasonal water availability, soil nutrient restoration, and climate resilience (${selected.resilience}/100). Grounded in NASA Earth observations.`;
+  if (q.includes("temperature") || q.includes("heat") || q.includes("cold") || q.includes("frost") || q.includes("season")) {
+    return `NASA POWER data tracks the seasonal temperature for your field. For ${selected.sequence[0]}, optimal growth is 22-32 degrees C. If temperatures exceed 35 degrees C during flowering, increase irrigation frequency. Your rotation resilience score is ${selected.resilience}/100.`;
+  }
+  if (q.includes("yield") || q.includes("harvest") || q.includes("production") || q.includes("output")) {
+    return `Your ${selected.name} rotation optimizes yields through complementary crop sequencing. ${selected.sequence[0]} typically yields 4-6 tonnes/ha under good management. Following with ${selected.sequence[1] ?? "a pulse crop"} restores soil nutrients for a stronger next harvest. Key: timely sowing, balanced NPK, and NASA-guided irrigation.`;
+  }
+  if (q.includes("rotation") || q.includes("sequence") || q.includes("cycle") || q.includes("next crop")) {
+    return `Your rotation **${selected.name}** follows: ${selected.sequence.join(" -> ")}. Chosen for: Water fit: ${selected.water}/100 | Soil health: ${selected.soil}/100 | Climate resilience: ${selected.resilience}/100. Action: ${selected.action}`;
+  }
+
+  // â”€â”€â”€ CATCH-ALL (varied by question length) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const catchAlls = [
+    `I'm here to help with your **${selected.sequence[0]}** crop and the **${selected.name}** rotation. Could you be more specific? For example: "Why are my leaves yellowing?", "When should I irrigate?", "What fertilizer for wheat?", or "How do I manage pests in rice?"`,
+    `Your field is on the **${selected.name}** plan (${selected.sequence.join(" -> ")}). I can give detailed guidance on: soil prep, sowing dates, fertilizer timing, pest control, or NASA weather data interpretation. What is your most pressing concern?`,
+    `Tell me more! Is your question about: Soil health | Irrigation | Pest control | Weather adaptation | Yield improvement? The more details you share, the better I can tailor advice for your **${selected.sequence[0]}** crop.`,
+  ];
+  return catchAlls[q.length % catchAlls.length]!;
 }
 
 // Sample farmer shown in the demo Profile section (not a real person).

@@ -14,6 +14,8 @@ export const translationDictionary: Record<
   // Navigation & General
   "AgroNova": { bn: "এগ্রোনোভা", hi: "एग्रोनोवा", es: "AgroNova", sw: "AgroNova" },
   "Demo workspace": { bn: "ডেমো কর্মক্ষেত্র", hi: "डेमो कार्यक्षेत्र", es: "Espacio de prueba", sw: "Sehemu ya majaribio" },
+  "Nova": { bn: "নোভা", hi: "नोवा", es: "Nova", sw: "Nova" },
+  "NOVA": { bn: "নোভা", hi: "नोवा", es: "Nova", sw: "Nova" },
   "Farmer Workspace": { bn: "কৃষক কর্মক্ষেত্র", hi: "किसान कार्यक्षेत्र", es: "Espacio del agricultor", sw: "Sehemu ya mkulima" },
   "Live NASA Observations · Bangladesh Fields": {
     bn: "সরাসরি নাসা পর্যবেক্ষণ · বাংলাদেশের ফসলি জমি",
@@ -229,6 +231,13 @@ export function translateDomTree(rootNode: Node, targetLang: Language) {
         if (tag === "script" || tag === "style" || tag === "noscript" || tag === "pre") {
           return NodeFilter.FILTER_REJECT;
         }
+        if (
+          parent.closest(".notranslate") ||
+          parent.closest("[translate='no']") ||
+          parent.getAttribute("translate") === "no"
+        ) {
+          return NodeFilter.FILTER_REJECT;
+        }
         if (!node.textContent || node.textContent.trim().length === 0) {
           return NodeFilter.FILTER_REJECT;
         }
@@ -283,7 +292,28 @@ export function translateDomTree(rootNode: Node, targetLang: Language) {
 }
 
 /**
- * Triggers full page translation using Google Translate widget + DOM engine
+ * Clears legacy googtrans cookies that trigger Google's "Translated to: English" banner
+ */
+export function clearGoogleTranslateCookies() {
+  if (typeof window === "undefined") return;
+  try {
+    const host = window.location.hostname;
+    document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=${host}; path=/;`;
+    if (host.includes(".")) {
+      const rootDomain = "." + host.split(".").slice(-2).join(".");
+      document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=${rootDomain}; path=/;`;
+    }
+  } catch {}
+}
+
+// Automatically clear legacy cookies on client load
+if (typeof window !== "undefined") {
+  clearGoogleTranslateCookies();
+}
+
+/**
+ * Triggers full page translation using AgroNova's native DOM translation engine
  */
 export function applyFullPageTranslation(targetLang: Language) {
   if (typeof window === "undefined") return;
@@ -293,25 +323,12 @@ export function applyFullPageTranslation(targetLang: Language) {
     localStorage.setItem("agronova_language", targetLang);
   } catch {}
 
-  // 2. Set googtrans cookie for current domain and root domain
-  const host = window.location.hostname;
-  document.cookie = `googtrans=/en/${targetLang}; path=/`;
-  document.cookie = `googtrans=/en/${targetLang}; domain=${host}; path=/`;
-  if (host.includes(".")) {
-    const rootDomain = "." + host.split(".").slice(-2).join(".");
-    document.cookie = `googtrans=/en/${targetLang}; domain=${rootDomain}; path=/`;
-  }
+  // 2. Ensure Google Translate cookies are eliminated to prevent popups
+  clearGoogleTranslateCookies();
 
   // 3. Update HTML lang tag
   document.documentElement.lang = targetLang;
 
-  // 4. Trigger Google Translate dropdown if available
-  const combo = document.querySelector<HTMLSelectElement>(".goog-te-combo");
-  if (combo) {
-    combo.value = targetLang;
-    combo.dispatchEvent(new Event("change"));
-  }
-
-  // 5. Run immediate DOM text translation
+  // 4. Run immediate native AgroNova DOM text translation
   translateDomTree(document.body, targetLang);
 }
