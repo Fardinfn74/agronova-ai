@@ -630,7 +630,7 @@ function FinalCta() {
           Let's farm with the sky, together.
         </h2>
         <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-lg">
-          AgroNova is our team's entry for the NASA Space Apps Challenge 2026
+          AgroNova is Team Vision-X's entry for the NASA Space Apps Challenge 2026
           — Field Shift. We're building it with and for farming communities.
         </p>
         <div className="mt-9 flex flex-wrap justify-center gap-4">
@@ -665,7 +665,7 @@ function Footer() {
             <span className="font-display font-semibold">AgroNova</span>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 text-muted-foreground">
-            <p>Built for NASA Space Apps Challenge 2026 · Powered by open NASA Earth data</p>
+            <p>Built by Team Vision-X for NASA Space Apps Challenge 2026 · Powered by open NASA Earth data</p>
             <div className="flex items-center gap-3">
               <Link to="/pricing" className="text-primary hover:underline">Pricing</Link>
               <Link to="/demo" className="hover:underline">Demo</Link>
@@ -673,7 +673,7 @@ function Footer() {
             </div>
           </div>
           <p className="text-muted-foreground">
-            © 2026 Team AgroNova
+            © 2026 Team Vision-X · AgroNova
           </p>
         </div>
       </div>

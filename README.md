@@ -76,3 +76,15 @@ Visit [http://localhost:8080](http://localhost:8080) for the public landing page
 - **Backend & Auth**: Supabase & Drizzle ORM
 - **Bundler**: Vite 8 & TypeScript
 - **Engine**: Nitro & ECMWF Open-Meteo & NASA APIs
+
+---
+
+## 👥 Team Vision-X (Sylhet Region)
+
+- **Al Wahed Fardin** — Team Leader
+- **Ahnaf Tahmid Nafi** — Team Member
+- **Abrar Sahriar** — Team Member
+- **Ramisa Anjum Simi** — Team Member
+- **Ramis Fariha Bhabna** — Team Member
+- **Erina Siddiqua Eram** — Team Member
+

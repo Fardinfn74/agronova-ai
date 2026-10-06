@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "AgroNova is an AI farming companion built for the NASA Space Apps Challenge 2026 Field Shift challenge — helping farmers adapt their fields using NASA Earth-observation data.",
       },
-      { name: "author", content: "AgroNova Team" },
+      { name: "author", content: "Team Vision-X" },
       { property: "og:title", content: "AgroNova — AI Farming Companion" },
       {
         property: "og:description",
