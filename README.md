@@ -131,12 +131,6 @@ VITE_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
 
 > See `.env.example` for the complete list, including the AI service key.
 
-### Deploy to Vercel
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FFardinfn74%2Fagronova-ai)
-
-Import the repo, add the environment variables above, use `npm install` and `npm run build`, then deploy.
-
 ---
 
 ## 🛠️ Tech stack
